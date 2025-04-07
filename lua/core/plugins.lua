@@ -135,17 +135,7 @@ require("lazy").setup({
 		end,
 	},
 
-	is_linux
-			and {
-				"alexghergh/nvim-tmux-navigation",
-				config = function()
-					nvim_tmux_nav = require("nvim-tmux-navigation")
-					nvim_tmux_nav.setup({
-						disable_when_zoomed = true, -- defaults to false
-					})
-				end,
-			}
-		or nil, -- Use `nil` if the condition is false to skip loading
+
 	"TamaMcGlinn/quickfixdd",
 	"szw/vim-maximizer",
 
@@ -322,8 +312,6 @@ require("lazy").setup({
 	-- 		-- "rcarriga/nvim-notify",
 	-- 	},
 	-- },
-}, {
-	rocks = {
-		hererocks = true, -- Enables hererocks globally for all plugins
-	},
+
+
 })
