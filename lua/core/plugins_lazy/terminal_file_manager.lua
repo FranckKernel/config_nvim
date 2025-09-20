@@ -12,11 +12,11 @@ return {
 
 		keys = {
 
-			{ "<leader>lf", "<cmd>lua require('tfm').open()<CR>", desc = "Open lf (file manager)" },
-			{ "<leader>rr", "<cmd>lua require('tfm').open()<CR>", desc = "TFM" },
-			{ "<leader>rv", "<cmd>lua require('tfm').open(nil, require('tfm').OPEN_MODE.split)<CR>", desc = "TFM - horizontal split" },
-			{ "<leader>rh", "<cmd>lua require('tfm').open(nil, require('tfm').OPEN_MODE.vsplit)<CR>", desc = "TFM - vertical split" },
-			{ "<leader>rt", "<cmd>lua require('tfm').open(nil, require('tfm').OPEN_MODE.tabedit)<CR>", desc = "TFM - new tab" },
+			{ "<leader>lf", function() require("tfm").open() end, desc = "Open lf (file manager)" },
+			{ "<leader>rr", function() require("tfm").open() end, desc = "TFM" },
+			{ "<leader>rv", function() require("tfm").open(nil, require("tfm").OPEN_MODE.split) end, desc = "TFM - horizontal split" },
+			{ "<leader>rh", function() require("tfm").open(nil, require("tfm").OPEN_MODE.vsplit) end, desc = "TFM - vertical split" },
+			{ "<leader>rt", function() require("tfm").open(nil, require("tfm").OPEN_MODE.tabedit) end, desc = "TFM - new tab" },
 
 			{ "<leader>TT", ":Tfm<CR>", desc = "TFM" },
 			{ "<leader>TH", ":TfmSplit<CR>", desc = "TFM - horizontal split" },
