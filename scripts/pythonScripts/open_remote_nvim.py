@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+# $HOME/.config/nvim/scripts/pythonScripts/open_remote_nvim.py
+# $HOME/.config/nvim/nvim-possession/lua/nvim-possession/regular_init.lua
+# $HOME/.config/nvim/lua/core/plugins_lazy/possessions.lua
 
 import os
 import subprocess
@@ -39,7 +42,9 @@ def open_nvim(files: List[str], remote_session_name: str = DEFAULT_RSM):
         f"autocmd VimEnter * ++once lua {lua_cmd}",
     ]
 
+    # to gf too the file
     plugin_code = "$HOME/.config/nvim/nvim-possession/lua/nvim-possession/regular_init.lua"
+    config_code = "$HOME/.config/nvim/lua/core/plugins_lazy/possessions.lua"
 
     if INFORM_MESSAGE:
         # Start Neovim (blocking, but it will allow other threads to run)

@@ -89,6 +89,41 @@ M.lsp_name_of_filetype = {
 	S = "asm_lsp",
 }
 
+-- Lazy mapping: filetype -> function that returns the LSP config
+M.config_of_filetype = {
+	lua = function() return require("lsps.lua") end,
+	python = function() return require("lsps.python") end,
+	bash = function() return require("lsps.bash") end,
+	sh = function() return require("lsps.bash") end,
+	zsh = function() return require("lsps.bash") end,
+	opencl = function() return require("lsps.opencl") end,
+	c = function() return require("lsps.c") end,
+	cpp = function() return require("lsps.c") end,
+	objc = function() return require("lsps.c") end,
+	objcpp = function() return require("lsps.c") end,
+	rust = function() return require("lsps.rust") end,
+	java = function() return require("lsps.java") end,
+	tex = function() return require("lsps.latex") end,
+	latex = function() return require("lsps.latex") end,
+	bib = function() return require("lsps.latex") end,
+	asm = function() return require("lsps.asm") end,
+	s = function() return require("lsps.asm") end,
+	S = function() return require("lsps.asm") end,
+}
+
+-- Lazy loader: LSP server name -> function returning its config
+M.config_of_lspname = {
+	bashls = function() return require("lsps.bash") end,
+	lua_ls = function() return require("lsps.lua") end,
+	pyright = function() return require("lsps.python") end,
+	clangd = function() return require("lsps.c") end,
+	rust_analyzer = function() return require("lsps.rust") end,
+	jdtls = function() return require("lsps.java") end,
+	texlab = function() return require("lsps.latex") end,
+	asm_lsp = function() return require("lsps.asm") end,
+	opencl = function() return require("lsps.opencl") end,
+}
+
 --- @param name string The name of the LSP server (e.g., "pyright", "clangd").
 function M.try_attach_lsp_to_buffer(name, bufnr)
 	local clients = vim.lsp.get_clients({ bufnr = bufnr })
@@ -112,7 +147,13 @@ function M.try_attach_lsp_to_buffer(name, bufnr)
 
 	-- LSP is not initialized, start it
 	gu().print_custom("⚠️ LSP " .. name .. " not found to attach to buffer " .. bufnr)
-	-- require("lspconfig")[name].setup({}) -- Start the LSP if not running
+
+	local conf_fn = M.config_of_lspname[name]
+	if conf_fn then
+		require("lspconfig")[name].setup(conf_fn())
+	else
+		gu().print_custom("⚠️ No config function found for LSP " .. name)
+	end
 	return false
 end
 

@@ -1,3 +1,6 @@
+-- $HOME/.config/nvim/scripts/pythonScripts/open_remote_nvim.py
+-- $HOME/.config/nvim/nvim-possession/lua/nvim-possession/regular_init.lua
+-- $HOME/.config/nvim/lua/core/plugins_lazy/possessions.lua
 local M = {}
 
 local ggu = function() return require("_before.general_utils") end
@@ -89,9 +92,15 @@ function M.config()
 			exclude_ft = { "NvimTree", "neo-tree", "TelescopePrompt" },
 		},
 		post_hook = function()
+			-- $HOME/.config/nvim/scripts/pythonScripts/open_remote_nvim.py
+			-- $HOME/.config/nvim/nvim-possession/lua/nvim-possession/regular_init.lua
+			-- $HOME/.config/nvim/lua/core/plugins_lazy/possessions.lua
+
 			vim.cmd([[ScopeLoadState]])
 			load_tab_names()
 			vim.cmd([[AttachAllLSPs]])
+			-- The attach all lsp call is needed for the one buffer i was active on
+
 			vim.cmd("doautocmd User PossessionSessionLoaded")
 		end,
 		save_hook = function()

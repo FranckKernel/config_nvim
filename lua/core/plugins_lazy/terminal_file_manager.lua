@@ -1,4 +1,4 @@
--- Maybe switch to an lf specific plugings, so it works better?
+-- TODO: Maybe switch to an lf specific plugings, so it works better?
 -- And then, I can also work with cd on quit.
 return {
 	{

@@ -1,12 +1,3 @@
-if false then
-	local lspconfig = {}
-	lspconfig.asm_lsp.setup({
-		cmd = { "asm-lsp" },
-		filetypes = { "asm", "s", "S" },
-		root_dir = lspconfig.util.root_pattern(".git", ".asm-lsp.toml"),
-	})
-end
-
 local M = {}
 
 M.config = {

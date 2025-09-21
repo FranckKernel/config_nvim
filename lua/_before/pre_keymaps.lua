@@ -14,10 +14,11 @@ keymap.set("i", "JK", "<Esc>", opts("Exit Insert Mode"))
 keymap.set("v", "jk", "<Esc>", opts("Exit Visual Mode"))
 keymap.set("v", "JK", "<Esc>", opts("Exit Visual Mode"))
 
-keymap.set("i", "jl", "<Esc>", opts("Exit Insert Mode"))
-keymap.set("i", "JL", "<Esc>", opts("Exit Insert Mode"))
-keymap.set("v", "jl", "<Esc>", opts("Exit Visual Mode"))
-keymap.set("v", "JL", "<Esc>", opts("Exit Visual Mode"))
+-- this will fuck "jump less equal" instruction
+-- keymap.set("i", "jl", "<Esc>", opts("Exit Insert Mode"))
+-- keymap.set("i", "JL", "<Esc>", opts("Exit Insert Mode"))
+-- keymap.set("v", "jl", "<Esc>", opts("Exit Visual Mode"))
+-- keymap.set("v", "JL", "<Esc>", opts("Exit Visual Mode"))
 
 -- Map Enter in normal mode to add a new line (This breaks enter on a lot of things)
 -- keymap.set("n", "<CR>", "o<Esc>", opts("Open a new line"))
