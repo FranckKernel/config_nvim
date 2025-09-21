@@ -5,7 +5,8 @@ import re
 from send_notification import send_notification, write_to_file
 
 
-INFORM_MESSAGE = True
+INFORM_MESSAGE = False
+# -- DEBUG
 
 
 def return_only_ascii(string):
