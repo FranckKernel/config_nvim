@@ -214,9 +214,9 @@ return {
 						return vim.fn.exepath("python3") or "python"
 					end,
 
-					-- program = "${file}", -- Run the currently open file
+					program = "${file}", -- Run the currently open file
 
-					program = "/home/francois/Documents/Work/RQC/2025/Fraud/code/example_usage.py", -- Run the currently open file
+					-- program = "/home/francois/Documents/Work/RQC/2025/Fraud/code/example_usage.py", -- Run the currently open file
 					-- cwd = "/home/francois/Documents/University (Real)/Semester 10/Comp 303/Project",
 					-- cwd = "/home/francois/Documents/Linux Documents/University (real)/Semester 10/Comp 303/Project/",
 					-- module = "303MUD.client_local",

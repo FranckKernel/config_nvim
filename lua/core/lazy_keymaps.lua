@@ -9,7 +9,13 @@ local function opts(desc) return { noremap = true, silent = true, desc = desc } 
 local ts_utils = require("nvim-treesitter.ts_utils")
 local gu = require("_before.general_utils")
 
+local DEBUG = false
+
 local function print_node_info(node, cursor_row, cursor_col)
+	if not DEBUG then
+		return
+	end
+
 	if not node then
 		print("No node at cursor position")
 		return
@@ -230,7 +236,9 @@ local function jump_to_prev_child()
 
 	local children = get_child_nodes_around_cursor(pair.node)
 	if not children then
-		print("no children")
+		if DEBUG then
+			print("no children")
+		end
 		return
 	end
 
