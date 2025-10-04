@@ -378,3 +378,46 @@ end
 
 -- Map it to <leader>w for convenience
 vim.keymap.set("n", "<leader>.w", ToggleWrap, { desc = "Toggle word wrap" })
+
+local function get_file_under_cursor()
+	local line = vim.api.nvim_get_current_line()
+	local col = vim.fn.col(".") -- 1-indexed
+	print("Cursor at column:", col)
+	print("Line:", line)
+
+	local path = nil
+
+	-- search for quotes
+	for s, quote_char, content, close_quote, e in line:gmatch("()([\"'])(.-)([\"'])()") do
+		print("Found quote:", quote_char, "start:", s, "end:", e, "content:", content)
+		if col > s and col < e then
+			path = content
+			print("Cursor inside quotes! Path:", path)
+			break
+		end
+	end
+
+	if not path then
+		path = vim.fn.expand("<cfile>")
+		print("Cursor not inside quotes. Using <cfile>:", path)
+	end
+
+	-- expand ~ and $HOME
+	path = path:gsub("^%$HOME", os.getenv("HOME")):gsub("^~", os.getenv("HOME"))
+	print("Expanded path:", path)
+
+	return path
+end
+
+local function open_file_under_cursor()
+	local path = get_file_under_cursor()
+	if vim.fn.filereadable(path) == 1 or vim.fn.isdirectory(path) == 1 then
+		print("Opening:", path)
+		vim.fn.jobstart({ "xdg-open", path }, { detach = true })
+	else
+		vim.notify("Path does not exist: " .. path, vim.log.levels.ERROR)
+	end
+end
+
+vim.keymap.set("n", "gk", open_file_under_cursor, { desc = "Open file under cursor (spaces/quotes supported)" })(
+"https://www.google.com")

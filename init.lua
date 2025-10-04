@@ -32,6 +32,7 @@ require("_before.pre_keymaps")
 require("_before.pre_config")
 require("_before.options")
 require("core.lazy") -- lazy load here
+require("core.tabout_keymaps")
 require("core.lazy_keymaps")
 require("core.tmux-sessionizer-keymaps")
 require("core.write_function_macros")
