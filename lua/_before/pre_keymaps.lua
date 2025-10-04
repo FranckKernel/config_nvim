@@ -419,5 +419,6 @@ local function open_file_under_cursor()
 	end
 end
 
-vim.keymap.set("n", "gk", open_file_under_cursor, { desc = "Open file under cursor (spaces/quotes supported)" })(
-"https://www.google.com")
+vim.keymap.set("n", "gk", open_file_under_cursor, { desc = "Open file under cursor (spaces/quotes supported)" })
+vim.keymap.set("n", "gX", open_file_under_cursor, { desc = "Open file under cursor (spaces/quotes supported)" })
+-- "https://www.google.com"
