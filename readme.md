@@ -1,3 +1,14 @@
+<div align="center" style="border:1px solid #000; padding:10px; display:inline-block;">
+  <strong># * DON'T USE THE MASTER BRANCH, USE THE FULLY LAZY BRANCH *</strong>
+</div>
+
+┌─────────────────────────────────────────────┐
+│ │
+│ **# DON'T USE THE MASTER BRANCH** │
+│ _USE THE FULLY LAZY BRANCH_ │
+│ │
+└─────────────────────────────────────────────┘
+
 # Screenshots
 
 Here's a screenshots with some stuff toggled on:
