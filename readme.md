@@ -55,9 +55,12 @@ git submodule update --remote --recursive
 # --recursive isn't always needed
 ```
 
-Packages to install:
+---
+---
+---
+# Packages to install:
 
-On Arch: (Use Paru or whatever else if thats what you are using. Though if you are on arch you probably dont need my help lol)
+## On Arch: (Use Paru or whatever else if thats what you are using. Though if you are on arch you probably dont need my help lol)
 
 ```bash
 # Install system packages from the official Arch repositories
@@ -79,10 +82,37 @@ go install github.com/hyprland-community/hyprls/cmd/hyprls@latest
 
 
 ```
+--- 
+# On Fedora 
+
+```bash 
+# Core system packages
+sudo dnf install -y --skip-unavailable \
+git make cmake clang clang-tools-extra rust-analyzer ruby \
+npm nodejs prettier python3-pip python3-virtualenv flake8 \
+lua-language-server bash-language-server go java-17-openjdk-devel
+
+# Node LSPs
+npm install -g typescript typescript-language-server tailwindcss
+
+# Ruby LSP
+gem install solargraph
+
+# Java LSP
+# Fedora has jdtls in dnf repositories
+sudo dnf install -y jdtls
+
+# Hyprland LSP
+go install github.com/hyprland-community/hyprls/cmd/hyprls@latest
+
+# Optional Python tools
+pip3 install debugpy isort mypy pylint ruff black
+
+```
 
 ---
 
-On MacOS:
+## On MacOS:
 Note: I don't have a mac, so it might not work perfectly, in which case we'll need to go and find out which package manager gives them
 
 ```bash
