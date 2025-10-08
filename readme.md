@@ -35,7 +35,17 @@ mkdir -p ~/.config/nvim_logs
 [ -d ~/.config/nvim ] && mv --backup=numbered ~/.config/nvim ~/.config/nvim_backup
 
 # Clone the Neovim configuration repository
-git clone https://github.com/PoutineSyropErable/config_nvim ~/.config/nvim
+git clone --branch fully_lazy https://github.com/PoutineSyropErable/config_nvim ~/.config/nvim
+
+```
+
+Submodule stuff:
+
+```bash
+cd ~/.config/nvim
+git submodule init
+git submodule update --recursive
+git submodule update --remote --recursive
 
 ```
 
