@@ -6,3 +6,6 @@ no_tracking
 old_vim/**
 
 others/**
+
+**/*.pyc
+**/__pycache__/

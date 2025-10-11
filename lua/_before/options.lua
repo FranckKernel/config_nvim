@@ -22,7 +22,8 @@ vim.opt.mouse = "nvc" -- Enable mouse in Normal, Visual, and Command mode
 
 vim.cmd([[ set noswapfile ]])
 vim.cmd([[ set termguicolors ]])
---vim.opt.clipboard = 'unnamedplus'
+vim.opt.clipboard = "unnamedplus" -- Yeah, I got tired of having two different clipboard.
+-- It was annoying to not have this. And the advantage of two clipboard... not worth it
 --Line numbers
 vim.wo.number = true
 vim.opt.number = true

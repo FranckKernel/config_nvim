@@ -1,5 +1,4 @@
 ------------------------------------------ SYMBOL SEARCH FUNCTION FOR MACROS ---------------
-
 local keymap = vim.keymap
 local function opts(desc) return { noremap = true, silent = true, desc = desc } end
 local gu = function() return require("_before.general_utils") end
