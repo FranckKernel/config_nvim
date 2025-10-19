@@ -130,6 +130,11 @@ local function jump_out_forward()
 		local cursor_row, cursor_col = unpack(vim.api.nvim_win_get_cursor(0))
 		cursor_row = cursor_row - 1 -- Convert to 0-based
 
+		local mode = vim.api.nvim_get_mode().mode
+		if mode:match("[iRs]") then
+			cursor_col = cursor_col - 1
+		end
+
 		-- Check if cursor is already at this node's end
 		if cursor_row == end_row and cursor_col == end_col - 1 then
 			local parent = node:parent()
@@ -146,6 +151,11 @@ local function jump_out_forward()
 	-- Find the appropriate jump target
 	local target = find_jump_target(pair.node)
 	if target then
+		-- If in insert mode, move left one column
+		local mode = vim.api.nvim_get_mode().mode
+		if mode:match("[iRs]") then
+			target[2] = target[2] + 1
+		end
 		vim.api.nvim_win_set_cursor(0, target)
 	end
 end
