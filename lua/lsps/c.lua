@@ -22,13 +22,15 @@ M.config = {
 		fallbackFlags = {
 			-- Standard C/C++ flags (comment out OpenCL-specific ones)
 			"-std=c23",
+			"-x",
+			"c", -- "-x c" force C
 			-- "-std=c17",
 			-- "-std=c++17",
 			-- "-I/usr/local/include",  -- Common include paths
 			-- Keep OpenCL flags only for actual OpenCL files
 		},
 	},
-	filetypes = { "c", "cpp", "objc", "objcpp" }, -- Removed "x" and "opencl"
+	filetypes = { "c", "h", "cpp", "objc", "objcpp" }, -- Removed "x" and "opencl"
 	root_dir = require("lspconfig.util").root_pattern(
 		"compile_commands.json",
 		".clang-format",

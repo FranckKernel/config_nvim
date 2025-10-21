@@ -22,8 +22,15 @@ vim.opt.mouse = "nvc" -- Enable mouse in Normal, Visual, and Command mode
 
 vim.cmd([[ set noswapfile ]])
 vim.cmd([[ set termguicolors ]])
-vim.opt.clipboard = "unnamedplus" -- Yeah, I got tired of having two different clipboard.
--- It was annoying to not have this. And the advantage of two clipboard... not worth it
+
+local use_system_clipboard = require("_before.pre_config").use_system_clipboard
+if use_system_clipboard then
+	vim.opt.clipboard = "unnamedplus"
+	-- Yeah, I got tired of having two different clipboard.
+	-- It was annoying to not have this. And the advantage of two clipboard... not worth it
+	-- Counter Point: This makes copy pasting even worse for Browser -> Neovim. As I cant delete and be right back
+end
+
 --Line numbers
 vim.wo.number = true
 vim.opt.number = true
@@ -53,8 +60,6 @@ vim.opt.listchars = {
 	precedes = "«",
 	extends = "»",
 }
-
---vim.opt.clipboard = 'unnamedplus'
 
 -- Remove `c` and `r` from formatoptions to exclude comments
 --vim.o.formatoptions = vim.o.formatoptions:gsub('c', ''):gsub('r', '')

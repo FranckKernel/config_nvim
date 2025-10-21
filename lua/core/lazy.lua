@@ -16,9 +16,23 @@ require("lazy").setup({
 		dependencies = {
 			{ "nvim-telescope/telescope.nvim" },
 		},
-		config = function() require("neoclip").setup() end,
+		config = function()
+			local use_system_clipboard = require("_before.pre_config").use_system_clipboard
+
+			if use_system_clipboard then
+				require("neoclip").setup({
+					default_register = "+",
+					default_register_macros = "q",
+					enable_macro_history = true,
+				})
+			else
+				require("neoclip").setup({})
+			end
+		end,
+
 		lazy = true,
 	},
+
 	{ -- autocomplete () {}
 		"windwp/nvim-autopairs",
 		event = "InsertEnter",
