@@ -117,6 +117,17 @@ return {
 				vim.cmd("edit " .. new_file)
 			end
 
+			local function autocomplete_selection(prompt_bufnr)
+				local entry = action_state.get_selected_entry()
+				if entry then
+					local current_picker = action_state.get_current_picker(prompt_bufnr)
+					local prompt = entry.value or entry.path or entry[1]
+
+					-- replace the current prompt with the selected entry
+					current_picker:set_prompt(prompt)
+				end
+			end
+
 			telescope.setup({
 				defaults = {
 					layout_strategy = "horizontal",
@@ -132,7 +143,7 @@ return {
 							preview_height = 0.5,
 						},
 					},
-					file_ignore_patterns = { "node_modules/.*", "%.git/.*", "%.nvim%-session/.*" },
+					file_ignore_patterns = { "node_modules/.*", "%.git/.*", "%.nvim%-session/.*", "%.o$" },
 				},
 				pickers = {
 					find_files = {
@@ -141,6 +152,7 @@ return {
 						follow = true,
 						attach_mappings = function(_, map)
 							map("i", "<C-n>", create_new_file)
+							map("i", "<Tab>", autocomplete_selection)
 							return true
 						end,
 					},

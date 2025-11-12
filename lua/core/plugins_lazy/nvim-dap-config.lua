@@ -260,6 +260,15 @@ return {
 				-- command = vim.fn.expand("~") .. "/.vscode/extensions/ms-vscode.cpptools-1.23.5-linux-x64/debugAdapters/bin/OpenDebugAD7",
 			}
 
+			-- Add this inside your config function, after `local dap = require("dap")`
+			dap.adapters.gdb = {
+				type = "executable",
+				command = "i686-elf-gdb",
+				args = { "--interpreter=dap", "--eval-command", "set print pretty on" },
+				-- Fails, because my i686-elf-gdb is version 13.2, but needs > 14.0
+				-- Let's try to compile it
+			}
+
 			dap.configurations.c = {
 
 				{
@@ -289,6 +298,31 @@ return {
 					args = arg_func,
 				},
 				-- other_c_dap,
+
+				{
+					name = "Attach to Remote GDB :1234",
+					type = "gdb",
+					request = "attach",
+					program = "${workspaceFolder}/build/myos.bin", -- Optional, can specify ELF
+					cwd = "${workspaceFolder}",
+					remote = true,
+					target = "localhost:1234", -- the port QEMU listens on
+					stopAtEntry = false,
+
+					setupCommands = dap_helper.setupCommands,
+					-- setupCommands = {
+					-- 	{
+					-- 		text = "set sysroot /",
+					-- 		description = "Set sysroot to /",
+					-- 		ignoreFailures = true,
+					-- 	},
+					-- 	{
+					-- 		text = "set architecture i386:x86-32",
+					-- 		description = "Target architecture",
+					-- 		ignoreFailures = true,
+					-- 	},
+					-- },
+				},
 			}
 
 			dap.configurations.cpp = dap.configurations.c -- Apply same config for C++
