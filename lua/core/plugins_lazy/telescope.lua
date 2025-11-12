@@ -143,7 +143,7 @@ return {
 							preview_height = 0.5,
 						},
 					},
-					file_ignore_patterns = { "node_modules/.*", "%.git/.*", "%.nvim%-session/.*", "%.o$" },
+					file_ignore_patterns = { "node_modules/.*", "%.git/.*", "%.nvim%-session/.*", "%.o$", "%.bin$" },
 				},
 				pickers = {
 					find_files = {
