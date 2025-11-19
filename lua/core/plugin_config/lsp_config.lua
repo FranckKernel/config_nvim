@@ -1,7 +1,8 @@
 require("mason-lspconfig").setup({
+
 	-- ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "jdtls" },
-	-- ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "rust_analyzer", "texlab" },
-	-- automatic_installation = true,
+	ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "rust_analyzer", "texlab" },
+	automatic_installation = true,
 })
 
 require("mason-tool-installer").setup({
@@ -42,7 +43,26 @@ local lspconfig = require("lspconfig")
 local lsp_defaults = lspconfig.util.default_config
 _G.MyRootDir = nil -- Global variable to hold the root directory
 
-lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, require("cmp_nvim_lsp").default_capabilities())
+lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities,
+	require("cmp_nvim_lsp").default_capabilities())
+
+vim.diagnostic.config({
+	virtual_text = {
+		prefix = "■", -- Could be "■", "▶", "●", etc.
+		spacing = 2,
+		severity = nil, -- Show all severities
+	},
+	signs = true,
+	underline = true,
+	update_in_insert = false, -- don’t update while typing
+	severity_sort = true,
+	float = {
+		border = "rounded", -- border for hover window
+		source = "always", -- show source in float
+		header = "",
+		prefix = "",
+	},
+})
 
 ---------------------------------------- ASM -------------------------------------
 
@@ -121,16 +141,17 @@ lspconfig.clangd.setup({
 		-- clangd command with additional options
 		"clangd",
 		"--offset-encoding=utf-16",
-		"--background-index", -- Enable background indexing
-		"--clang-tidy", -- Enable clang-tidy diagnostics
+		"--background-index",   -- Enable background indexing
+		"--clang-tidy",         -- Enable clang-tidy diagnostics
 		"--completion-style=bundled", -- Style for autocompletion
-		"--cross-file-rename", -- Support for renaming symbols across files
+		"--cross-file-rename",  -- Support for renaming symbols across files
 		"--header-insertion=iwyu", -- Include "what you use" insertion
 		"--log=verbose",
 	},
 	capabilities = lsp_defaults.capabilities, -- Auto-completion capabilities
 	filetypes = { "c", "cpp", "objc", "objcpp", "x" },
-	root_dir = lspconfig.util.root_pattern("compile_commands.json", ".clang-format", ".clangd", "compile_flags.txt", "Makefile", "build.sh", ".git"),
+	root_dir = lspconfig.util.root_pattern("compile_commands.json", ".clang-format", ".clangd", "compile_flags.txt",
+		"Makefile", "build.sh", ".git"),
 	settings = {
 		clangd = {
 			fallbackFlags = { "-std=c++17" }, -- Adjust this if using a different C++ standard
@@ -146,8 +167,8 @@ lspconfig.clangd.setup({
 --------------------------------------- RUST ---------------------------------------
 lspconfig.rust_analyzer.setup({
 	cmd = { "rust-analyzer" },
-	capabilities = lsp_defaults.capabilities, -- Enable LSP capabilities
-	filetypes = { "rust" }, -- Apply to Rust files
+	capabilities = lsp_defaults.capabilities,                                       -- Enable LSP capabilities
+	filetypes = { "rust" },                                                         -- Apply to Rust files
 	root_dir = lspconfig.util.root_pattern("Cargo.toml", "rust-project.json", ".git"), -- Detect project root
 	settings = {
 		["rust-analyzer"] = {
@@ -200,7 +221,9 @@ if useJavaLspConfig then
 
 	local get_debug_plugin = function()
 		local home = os.getenv("HOME")
-		local cmd = "ls -1 " .. home .. "/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar 2>/dev/null"
+		local cmd = "ls -1 " ..
+			home ..
+			"/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar 2>/dev/null"
 
 		local result = vim.fn.systemlist(cmd)
 
@@ -300,9 +323,9 @@ vim.api.nvim_create_autocmd("VimLeavePre", {
 
 ------------------------------------------------ LATEX AND TEXLIVE ------------------------------------------------
 
-local tex_output = os.getenv("HOME") .. "/.texfiles/" -- Directory for auxiliary files
-local pdf_output_dir = vim.fn.expand("%:p:h") -- Directory where the PDF should be saved
-local tex_file = vim.fn.expand("%:p") -- Full path to the LaTeX file
+local tex_output = vim.loop.os_homedir() .. "/.texfiles/"                  -- Directory for auxiliary files
+local pdf_output_dir = vim.fn.expand("%:p:h")                              -- Directory where the PDF should be saved
+local tex_file = vim.fn.expand("%:p")                                      -- Full path to the LaTeX file
 local pdf_file = pdf_output_dir .. "/" .. vim.fn.expand("%:t:r") .. ".pdf" -- PDF filename based on the LaTeX file
 
 lspconfig.texlab.setup({
@@ -345,11 +368,11 @@ lspconfig.texlab.setup({
 		print("PDF File:", pdf_file)
 		print(
 			"Compile Command: latexmk -pdf -interaction=nonstopmode -synctex=1 -aux-directory="
-				.. tex_output
-				.. " -output-directory="
-				.. pdf_output_dir
-				.. " "
-				.. tex_file
+			.. tex_output
+			.. " -output-directory="
+			.. pdf_output_dir
+			.. " "
+			.. tex_file
 		)
 		print("View Command: zathura --synctex-forward %l:1:%f " .. pdf_file)
 	end,
@@ -361,10 +384,10 @@ vim.g.vimtex_view_general_viewer = "zathura"
 vim.g.vimtex_view_general_options = "--synctex-forward @line:1:@tex"
 
 vim.g.vimtex_compiler_latexmk = {
-	aux_dir = tex_output, -- Auxiliary files directory
+	aux_dir = tex_output,  -- Auxiliary files directory
 	out_dir = pdf_output_dir, -- Output directory
 	callback = false,
-	continuous = false, -- Enable continuous compilation
+	continuous = false,    -- Enable continuous compilation
 	background = false,
 }
 

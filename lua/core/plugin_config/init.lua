@@ -1,4 +1,5 @@
 require("core.plugin_config.alpha")
+
 require("core.plugin_config.colorscheme")
 require("core.plugin_config.coloriser")
 
@@ -33,7 +34,7 @@ require("core.plugin_config.fugitive")
 require("core.plugin_config.undotree")
 require("core.plugin_config.toggleterm")
 require("core.plugin_config.markview")
-require("core.plugin_config.image")
+-- require("core.plugin_config.image")
 
 require("core.plugin_config.mini_surround")
 require("core.plugin_config.gitsigns")

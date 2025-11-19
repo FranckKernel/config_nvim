@@ -14,7 +14,7 @@ local nvim_possession = require("nvim-possession")
 local bufferline = require("bufferline")
 local tabpage = require("bufferline.tabpages") -- Ensure it exists
 
-local DEBUG = true -- Set to `true` to enable debug logs
+local DEBUG = true                             -- Set to `true` to enable debug logs
 
 local function get_tab_name(tabnr)
 	local ok, name = pcall(vim.api.nvim_tabpage_get_var, tabnr, "name")
@@ -109,7 +109,7 @@ nvim_possession.setup({
 
 	-- ✅ Automatically switch sessions when navigating projects
 	autoswitch = {
-		enable = true, -- Enable auto-switching
+		enable = true,                                        -- Enable auto-switching
 		exclude_ft = { "NvimTree", "neo-tree", "TelescopePrompt" }, -- Exclude specific filetypes
 	},
 
@@ -150,7 +150,7 @@ nvim_possession.setup({
 
 	-- ✅ Window options for session picker
 	fzf_winopts = {
-		width = 0.5, -- Set UI width
+		width = 0.5,       -- Set UI width
 		preview = {
 			vertical = "right:30%", -- Show session preview on right
 		},
@@ -173,4 +173,4 @@ local function ensure_session_exists()
 	end
 end
 
-ensure_session_exists()
+-- ensure_session_exists()

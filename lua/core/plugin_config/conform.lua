@@ -27,7 +27,7 @@ end
 uncrustify_args = {
 	command = "uncrustify",
 	stdin = false, -- Uncrustify does NOT support stdin
-	args = { "-c", os.getenv("HOME") .. "/uncrustify.cfg", "--replace", "--no-backup", "$FILENAME" },
+	args = { "-c",vim.loop.os_homedir() .. "/uncrustify.cfg", "--replace", "--no-backup", "$FILENAME" },
 }
 
 require("conform").setup({

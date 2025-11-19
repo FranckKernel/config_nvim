@@ -1,14 +1,13 @@
 -- Detect if the OS is Linux
 local is_linux = vim.loop.os_uname().sysname ~= "Windows_NT"
 
-print("is Linux: " .. tostring(is_linux))
 
 local get_buffer_plugins = require("buffer_manager")
 local buffer_plugin = get_buffer_plugins(PRE_CONFIG_FRANCK.use_bufferline)
 -- using preconfig like that is dumb for the current setup, but one day, it could be useful
 
 require("lazy").setup({
-	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
+	{ "catppuccin/nvim",         name = "catppuccin", priority = 1000 },
 	"tpope/vim-commentary",
 	"mattn/emmet-vim",
 	"nvim-tree/nvim-tree.lua",
@@ -50,12 +49,12 @@ require("lazy").setup({
 
 	-- DAP core and UI setup
 	{
-		"mfussenegger/nvim-dap", -- Main nvim-dap plugin
+		"mfussenegger/nvim-dap",        -- Main nvim-dap plugin
 		dependencies = {
-			"rcarriga/nvim-dap-ui", -- UI for nvim-dap
+			"rcarriga/nvim-dap-ui",     -- UI for nvim-dap
 			"nvim-telescope/telescope-dap.nvim", -- Telescope integration with DAP
 			"theHamsta/nvim-dap-virtual-text", -- Inline variable text while debugging
-			"nvim-neotest/nvim-nio", -- Required dependency for nvim-dap-ui
+			"nvim-neotest/nvim-nio",    -- Required dependency for nvim-dap-ui
 		},
 		lazy = true,
 		event = { "BufReadPost", "BufNewFile" }, -- Load when reading/creating files
@@ -66,7 +65,7 @@ require("lazy").setup({
 		"mfussenegger/nvim-dap-python",
 		dependencies = { "mfussenegger/nvim-dap" }, -- Ensure nvim-dap is loaded first
 		lazy = true,
-		ft = { "python" }, -- Only load when editing Python files
+		ft = { "python" },                    -- Only load when editing Python files
 	},
 
 	------- Java Support -----
@@ -117,7 +116,7 @@ require("lazy").setup({
 		opts = {},
 	},
 
-	{ "akinsho/toggleterm.nvim", version = "*", config = true },
+	{ "akinsho/toggleterm.nvim", version = "*",       config = true },
 
 	-------------------------------- 	END OF TERMINAL ----------------------------
 	{
@@ -249,7 +248,7 @@ require("lazy").setup({
 
 	{
 		"nvim-telescope/telescope.nvim",
-		tag = "0.1.4", -- Specific version/tag for stable release
+		tag = "0.1.4",                        -- Specific version/tag for stable release
 		dependencies = { "nvim-lua/plenary.nvim" }, -- Make sure plenary.nvim is available
 	},
 
@@ -267,7 +266,7 @@ require("lazy").setup({
 	-- fzf-native extension (requires building with 'make')
 	{
 		"nvim-telescope/telescope-fzf-native.nvim",
-		build = "make", -- Ensure it's compiled
+		build = "make",     -- Ensure it's compiled
 		after = "telescope.nvim", -- Load after telescope.nvim
 	},
 
