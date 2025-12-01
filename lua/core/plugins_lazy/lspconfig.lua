@@ -95,7 +95,7 @@ return {
 			vim.lsp.config("lua_ls", extend_capabilities(lua_lsp.config))
 			vim.lsp.config("pyright", extend_capabilities(python_lsp.config))
 
-			-- clangd, rust and other should be moved here
+			-- clangd, rust and asm should be moved here
 			vim.lsp.config("zls", extend_capabilities(zig_lsp.config))
 
 			vim.lsp.enable({ "lua_ls", "pyright", "zls" })
@@ -105,35 +105,35 @@ return {
 			if they_work then
 				vim.lsp.config("bashls", extend_capabilities(bash_lsp.config))
 
-				-- vim.lsp.config("asm_lsp", extend_capabilities(asm_lsp.config))
+				vim.lsp.config("asm_lsp", extend_capabilities(asm_lsp.config))
 				vim.lsp.config("clangd", extend_capabilities(c_lsp.config))
 				vim.lsp.config("opencl_ls", extend_capabilities(opencl_lsp.config))
 				vim.lsp.config("rust_analyzer", extend_capabilities(rust_lsp.config))
 
 				vim.lsp.config("texlab", extend_capabilities(latex_lsp.config))
 
-				vim.lsp.enable({ "bashls", "clangd", "opencl_ls", "rust_analyzer", "texlab" })
+				vim.lsp.enable({ "bashls", "asm_lsp", "clangd", "opencl_ls", "rust_analyzer", "texlab" })
 			end
 		end
 
 		if use_lsp_config then
-			-- Need the black magic calls above
 			local clangd_defaults = lspconfig.clangd.document_config.default_config
-			-- ^ Due to black magic, this call is necessary. It has side effects, and force the initialisation of the default clangd
+			-- ^ Due to black magic, this call is necessary. It has side effects,
+			-- and force the initialisation of the default clangd
 			lsp_defaults.capabilities = merged_capabilities
 
 			-- double setups of lua ls and pyright? (since use mason and the other are auto setups)
-			-- lspconfig.lua_ls.setup(lua_lsp.config)
-			-- lspconfig.pyright.setup(python_lsp.config)
+			-- lspconfig.lua_ls.setup(lua_lsp.config) -- already configured by native
+			-- lspconfig.pyright.setup(python_lsp.config) -- already configured by native
 			lspconfig.bashls.setup(bash_lsp.config)
 
-			-- lspconfig.asm_lsp.setup(asm_lsp.config)
+			lspconfig.asm_lsp.setup(asm_lsp.config)
 			lspconfig.clangd.setup(c_lsp.config)
 			lspconfig.opencl_ls.setup(opencl_lsp.config)
-			lspconfig.zls.setup(zig_lsp.config)
+			-- lspconfig.zls.setup(zig_lsp.config) -- already configured by native
 			lspconfig.rust_analyzer.setup(rust_lsp.config)
 
-			-- lspconfig.opencl_language_server.setup()
+			-- lspconfig.opencl_language_server.setup() -- wrong name?
 
 			lspconfig.texlab.setup(latex_lsp.config)
 			lspconfig.solargraph.setup({})
@@ -146,6 +146,7 @@ return {
 
 		if use_merged then
 			-- not coded yet
+			-- I'll just use both the other way
 		end
 
 		vim.diagnostic.config({
