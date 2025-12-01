@@ -39,11 +39,14 @@ return {
 		local lua_lsp = require("lsps.lua")
 		local python_lsp = require("lsps.python")
 		local bash_lsp = require("lsps.bash")
-		local opencl_lsp = require("lsps.opencl")
-		local c_lsp = require("lsps.c")
-		local rust_lsp = require("lsps.rust")
-		local latex_lsp = require("lsps.latex")
+
 		local asm_lsp = require("lsps.asm")
+		local c_lsp = require("lsps.c")
+		local opencl_lsp = require("lsps.opencl")
+		local zig_lsp = require("lsps.zig")
+		local rust_lsp = require("lsps.rust")
+
+		local latex_lsp = require("lsps.latex")
 
 		if use_mason then
 			local mason_lspconfig = require("mason-lspconfig")
@@ -51,8 +54,11 @@ return {
 				ensure_installed = {
 					"lua_ls",
 					"pyright",
+
 					"clangd",
+					"zls",
 					"rust_analyzer",
+
 					"texlab",
 					"solargraph",
 					"ts_ls",
@@ -89,14 +95,24 @@ return {
 			vim.lsp.config("lua_ls", extend_capabilities(lua_lsp.config))
 			vim.lsp.config("pyright", extend_capabilities(python_lsp.config))
 
+			-- clangd, rust and other should be moved here
+			vim.lsp.config("zls", extend_capabilities(zig_lsp.config))
+
+			vim.lsp.enable({ "lua_ls", "pyright", "zls" })
+
 			-- It seems the others don't quite works if i set them up like that
 			local they_work = false
 			if they_work then
-				vim.lsp.config("bash-language-server", extend_capabilities(bash_lsp.config))
-				vim.lsp.config("opencl_ls", extend_capabilities(opencl_lsp.config))
+				vim.lsp.config("bashls", extend_capabilities(bash_lsp.config))
+
+				-- vim.lsp.config("asm_lsp", extend_capabilities(asm_lsp.config))
 				vim.lsp.config("clangd", extend_capabilities(c_lsp.config))
+				vim.lsp.config("opencl_ls", extend_capabilities(opencl_lsp.config))
 				vim.lsp.config("rust_analyzer", extend_capabilities(rust_lsp.config))
+
 				vim.lsp.config("texlab", extend_capabilities(latex_lsp.config))
+
+				vim.lsp.enable({ "bashls", "clangd", "opencl_ls", "rust_analyzer", "texlab" })
 			end
 		end
 
@@ -106,17 +122,20 @@ return {
 			-- ^ Due to black magic, this call is necessary. It has side effects, and force the initialisation of the default clangd
 			lsp_defaults.capabilities = merged_capabilities
 
-			lspconfig.lua_ls.setup(lua_lsp.config)
-			lspconfig.pyright.setup(python_lsp.config)
+			-- double setups of lua ls and pyright? (since use mason and the other are auto setups)
+			-- lspconfig.lua_ls.setup(lua_lsp.config)
+			-- lspconfig.pyright.setup(python_lsp.config)
 			lspconfig.bashls.setup(bash_lsp.config)
-			lspconfig.rust_analyzer.setup(rust_lsp.config)
-			lspconfig.texlab.setup(latex_lsp.config)
-			lspconfig.asm_lsp.setup(asm_lsp.config)
 
+			-- lspconfig.asm_lsp.setup(asm_lsp.config)
 			lspconfig.clangd.setup(c_lsp.config)
 			lspconfig.opencl_ls.setup(opencl_lsp.config)
+			lspconfig.zls.setup(zig_lsp.config)
+			lspconfig.rust_analyzer.setup(rust_lsp.config)
+
 			-- lspconfig.opencl_language_server.setup()
 
+			lspconfig.texlab.setup(latex_lsp.config)
 			lspconfig.solargraph.setup({})
 			lspconfig.ts_ls.setup({})
 			lspconfig.gopls.setup({})

@@ -269,6 +269,47 @@ return {
 				-- Let's try to compile it
 			}
 
+			local function kernel_debug()
+				local cwd = vim.fn.getcwd()
+				local build_script = cwd .. "/build.sh"
+
+				if vim.fn.filereadable(build_script) == 0 then
+					error("Cannot find build.sh in workspace root")
+				end
+
+				print("[Kernel Debug] Running ./build.sh debug ...")
+
+				-- Run the command exactly as the user wants
+				local ret = os.execute(build_script .. " debug")
+
+				return "${workspaceFolder}/build/myos.bin"
+			end
+
+			local kdc = {
+				name = "Kernel Debug",
+				type = "gdb",
+				request = "attach",
+				program = function(callback) require("core.plugins_lazy.helper.dap").kernel_debug_async(callback) end, -- Optional, can specify ELF
+				cwd = "${workspaceFolder}",
+				remote = true,
+				target = "localhost:1234", -- the port QEMU listens on
+				stopAtEntry = false,
+
+				setupCommands = dap_helper.setupCommands,
+				-- setupCommands = {
+				-- 	{
+				-- 		text = "set sysroot /",
+				-- 		description = "Set sysroot to /",
+				-- 		ignoreFailures = true,
+				-- 	},
+				-- 	{
+				-- 		text = "set architecture i386:x86-32",
+				-- 		description = "Target architecture",
+				-- 		ignoreFailures = true,
+				-- 	},
+				-- },
+			}
+
 			dap.configurations.c = {
 
 				{

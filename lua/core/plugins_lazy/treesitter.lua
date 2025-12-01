@@ -37,7 +37,7 @@ return {
 
 					-- Only install if not already available
 					if not parsers.has_parser(lang) then
-						vim.schedule(function() install.install(lang) end)
+						vim.schedule(function() install.ensure_installed({ lang }) end)
 					end
 				end,
 			})

@@ -346,4 +346,90 @@ function M.find_executable_custom_debug()
 	vim.cmd("messages")
 end
 
+-- Promise-like helper
+local function await_job(cmd, args)
+	return coroutine.wrap(function(done)
+		vim.fn.jobstart({ cmd, unpack(args) }, {
+			stdout_buffered = true,
+			stderr_buffered = true,
+
+			on_stdout = function(_, data)
+				if data then
+					for _, line in ipairs(data) do
+						if line ~= "" then
+							print("[build.sh] " .. line)
+						end
+					end
+				end
+			end,
+
+			on_stderr = function(_, data)
+				if data then
+					for _, line in ipairs(data) do
+						if line ~= "" then
+							print("[build.sh:ERR] " .. line)
+						end
+					end
+				end
+			end,
+
+			on_exit = function(_, code) done(code) end,
+		})
+	end)
+end
+
+function M.kernel_debug_async(callback)
+	local cwd = vim.fn.getcwd()
+	local script = cwd .. "/build.sh"
+
+	if vim.fn.filereadable(script) == 0 then
+		error("Cannot find build.sh in workspace root")
+	end
+
+	print("[Kernel Debug] Running ./build.sh debug ...")
+
+	vim.fn.jobstart({ script, "debug" }, {
+		stdout_buffered = true,
+		stderr_buffered = true,
+
+		on_stdout = function(_, data)
+			if data then
+				for _, line in ipairs(data) do
+					if line ~= "" then
+						print("[build.sh] " .. line)
+					end
+				end
+			end
+		end,
+
+		on_stderr = function(_, data)
+			if data then
+				for _, line in ipairs(data) do
+					if line ~= "" then
+						print("[build.sh:ERR] " .. line)
+					end
+				end
+			end
+		end,
+
+		on_exit = function(_, code)
+			if code ~= 0 then
+				error("[Kernel Debug] Build failed with exit code " .. code)
+				return
+			end
+
+			print("[Kernel Debug] Build completed")
+
+			local bin = cwd .. "/build/myos.bin"
+			if vim.fn.filereadable(bin) == 0 then
+				error("Binary not found: " .. bin)
+				return
+			end
+
+			-- RETURN to DAP: this is the important part
+			callback(bin)
+		end,
+	})
+end
+
 return M

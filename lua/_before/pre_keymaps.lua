@@ -5,6 +5,7 @@ local keymap = vim.keymap
 local function opts(desc) return { noremap = true, silent = true, desc = desc } end
 
 local gu = require("_before.general_utils")
+local pre_config = require("_before.pre_config")
 local notify_debug = gu.send_notification
 local print_custom = gu.print_custom
 
@@ -98,12 +99,15 @@ keymap.set("n", "«", "@", { noremap = true, silent = true })
 ---------------------------WORD NAVIGATION:
 ------------------------------------------- REMAP of  e,q for end of word.
 ------------------------------------------- REMAP of w,s for start of word
--- Map `w` to move to the start of the next word
-keymap.set("n", "w", "w", { noremap = true, silent = true })
-keymap.set("n", "W", "W", { noremap = true, silent = true })
--- Map `s` to move to the end of the previous word
-keymap.set("n", "s", "ge", { noremap = true, silent = true })
-keymap.set("n", "S", "gE", { noremap = true, silent = true })
+
+if pre_config.word_ws then
+	-- Map `w` to move to the start of the next word
+	keymap.set("n", "w", "w", { noremap = true, silent = true })
+	keymap.set("n", "W", "W", { noremap = true, silent = true })
+	-- Map `s` to move to the end of the previous word
+	keymap.set("n", "s", "ge", { noremap = true, silent = true })
+	keymap.set("n", "S", "gE", { noremap = true, silent = true })
+end
 
 -- Map `e` to move to the end of the next word
 keymap.set("n", "e", "e", { noremap = true, silent = true })
@@ -161,11 +165,17 @@ keymap.set("v", "<BS>", '"_d', { noremap = true, silent = true })
 
 ---------------------- Fixes
 -- To have access to a way to increase an number
-keymap.set("n", "<leader>y", "<C-a>", { noremap = true, silent = true })
+keymap.set("n", "<leader>y", "<C-a>", opts("increase number, w also work to decrease"))
+keymap.set("n", "<leader>Y", "<C-a>", opts("increase number, w also work to decrease"))
 keymap.set("n", "<leader>w", "<C-x>", { noremap = true, silent = true })
 keymap.set("v", "<leader>y", "<C-a>", { noremap = true, silent = true })
 -- Remap Ctrl+v to Ctrl+q in all modes so block visual mode works
 keymap.set({ "" }, "<C-v>", "<C-q>", { noremap = true, silent = true })
+
+-------------------- SMALL QOL -------------------
+
+keymap.set("n", "x", '"_x', { noremap = true, silent = true })
+keymap.set("v", "x", '"_x', { noremap = true, silent = true })
 
 ----------------------Others ----------------------------
 -- Function to get the current file path and copy to clipboard
