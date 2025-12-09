@@ -8,31 +8,25 @@ local ggu = function() return require("_before.general_utils") end
 
 local keys = {
 	{
-		"rj",
-		function() require("flash").jump() end,
-		mode = { "n", "x", "o" },
-		desc = "flash jump",
-	},
-	{
-		"rt",
+		"wt",
 		function() require("flash").toggle() end,
 		mode = "n",
 		desc = "toggle flash search",
 	},
 	{
-		"rt",
+		"wt",
 		function() require("flash").treesitter() end,
 		mode = { "n", "x", "o" },
 		desc = "flash treesitter",
 	},
 	{
-		"ro",
+		"wo",
 		function() require("flash").remote() end,
 		mode = "o",
 		desc = "remote flash",
 	},
 	{
-		"rs",
+		"ws",
 		function() require("flash").treesitter_search() end,
 		mode = { "o", "x" },
 		desc = "treesitter search",

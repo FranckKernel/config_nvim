@@ -64,6 +64,24 @@ return {
 			end)
 		end
 
+		local function kill_vnc_session()
+			-- Find and kill VNC viewer process
+			ggu().print_custom("Killing vnc session")
+			local handle = io.popen("pgrep -f 'vncviewer.*localhost:5900' 2>/dev/null")
+			if handle == nil then
+				ggu().print_custom("nil handle")
+				return
+			end
+			local vnc_pid = handle:read("*a")
+			handle:close()
+
+			if vnc_pid and vnc_pid ~= "" then
+				vnc_pid = vnc_pid:gsub("%s+", "") -- Clean whitespace
+				ggu().print_custom("[DAP] Killing VNC viewer (PID: " .. vnc_pid .. ")")
+				os.execute("kill -9 " .. vnc_pid .. " 2>/dev/null")
+			end
+		end
+
 		dap.listeners.after.event_initialized["dapui_config"] = function() dapui.open() end
 
 		dap.listeners.before.event_initialized["dapui_config"] = function()
@@ -72,12 +90,27 @@ return {
 			-- focusOnDapDebugTerminal()
 		end
 
+		dap.listeners.before.disconnect["dapui_config"] = function()
+			-- extra line
+			ggu().print_custom("disconected")
+			kill_vnc_session()
+		end
+
 		dap.listeners.before.event_terminated["dapui_config"] = function()
-			-- dapui.close()
+			ggu().print_custom("before event terminated")
+			kill_vnc_session()
+			dapui.close()
 		end
 
 		dap.listeners.before.event_exited["dapui_config"] = function()
-			-- dapui.close()
+			ggu().print_custom("before exit")
+			kill_vnc_session()
+			dapui.close()
+		end
+
+		dap.listeners.after.event_stopped["dapui_config"] = function()
+			-- newline
+			-- This happen after stopping at a breakpoint, now is not the time to kill vnc
 		end
 
 		if remove_repl then

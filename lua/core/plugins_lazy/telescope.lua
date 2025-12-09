@@ -11,11 +11,26 @@ return {
 				function() require(hp).find_files() end,
 				desc = "Find Files",
 			},
-
 			{
 				"<leader>fF",
 				function() require(hp).find_files_in_project() end,
 				desc = "Find Files in Project",
+			},
+
+			{
+				"<leader>f1",
+				function() require(hp).find_files_back(1) end,
+				desc = "Find Files",
+			},
+			{
+				"<leader>f2",
+				function() require(hp).find_files_back(2) end,
+				desc = "Find Files",
+			},
+			{
+				"<leader>f3",
+				function() require(hp).find_files_back(3) end,
+				desc = "Find Files",
 			},
 
 			{
@@ -27,6 +42,21 @@ return {
 				"<leader>fG",
 				function() require(hp).live_grep_in_project() end,
 				desc = "Live grep in Project",
+			},
+			{
+				"<leader>g1",
+				function() require(hp).live_grep_back(1) end,
+				desc = "Live grep",
+			},
+			{
+				"<leader>g2",
+				function() require(hp).live_grep_back(2) end,
+				desc = "Live grep",
+			},
+			{
+				"<leader>g3",
+				function() require(hp).live_grep_back(3) end,
+				desc = "Live grep",
 			},
 
 			{
@@ -143,7 +173,20 @@ return {
 							preview_height = 0.5,
 						},
 					},
-					file_ignore_patterns = { "node_modules/.*", "%.git/.*", "%.nvim%-session/.*", "%.o$", "%.bin$", "%.dump$", "%build/.*" },
+					file_ignore_patterns = {
+						"node_modules/.*",
+						"%.git/.*",
+						"%.nvim%-session/.*",
+						"%.o$",
+						"lazy%-lock.json*",
+						"%.bin$",
+						"%.dump$",
+						"%build/.*",
+						"%.vim/.*",
+						"%old_vim/.*",
+						"%nvim_config/.*",
+						"%vim_config/.*",
+					},
 				},
 				pickers = {
 					find_files = {

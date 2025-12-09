@@ -1,5 +1,4 @@
-local hd = "core.plugins_lazy.helper.barbar"
-
+local dap_helper_fn = function() return require("core.plugins_lazy.helper.dap") end
 return {
 	{
 		"mfussenegger/nvim-dap",
@@ -10,8 +9,14 @@ return {
 			"nvim-telescope/telescope.nvim",
 		},
 		keys = {
+			{ "<F1>", function() dap_helper_fn().dap_tbreak_here() end, desc = "Set temporary breakpoint at current line" },
+			{ "<leader>bt", function() dap_helper_fn().dap_tbreak_here() end, desc = "Set temporary breakpoint at current line" },
+
 			{ "<leader>bb", function() require("dap").toggle_breakpoint() end, desc = "Toggle breakpoint at current line" },
+			{ "<F2>", function() require("dap").toggle_breakpoint() end, desc = "Toggle breakpoint at current line" },
+
 			{ "<leader>dc", function() require("dap").continue() end, desc = "Start/continue debugging session" },
+			{ "<F3>", function() require("dap").continue() end, desc = "Start/continue debugging session" },
 		},
 		cmd = {
 			"DapContinue",
@@ -172,17 +177,17 @@ return {
 			keymap.set("n", "<leader>dm", function() require("telescope").extensions.dap.threads() end, opts("Show running threads (Telescope UI)"))
 
 			-- Tests
-			keymap.set("n", "<leader>dTc", function()
+			keymap.set("n", "<leader>Tc", function()
 				if vim.bo.filetype == "python" then
 					require("dap-python").test_class()
 				end
-			end)
+			end, opts("Test class"))
 
-			keymap.set("n", "<leader>dTm", function()
+			keymap.set("n", "<leader>Tm", function()
 				if vim.bo.filetype == "python" then
 					require("dap-python").test_method()
 				end
-			end)
+			end, opts("Test method"))
 
 			------------------------------- Languages --------------------------
 
@@ -244,7 +249,7 @@ return {
 					cwd = "${workspaceFolder}",
 					args = arg_func, -- Script arguments
 					env = {}, -- Environment variables
-					stopOnEntry = false,
+					stopAtEntry = false,
 				},
 			}
 			--
@@ -255,59 +260,17 @@ return {
 				id = "cppdbg",
 				type = "executable",
 				command = vim.fn.expand("~") .. "/.vscode/extensions/ms-vscode.cpptools-1.26.5/debugAdapters/bin/OpenDebugAD7",
-				-- command = vim.fn.expand("~") .. "/.vscode/extensions/ms-vscode.cpptools-1.24.5-linux-x64/debugAdapters/bin/OpenDebugAD7",
-				-- command = vim.fn.expand("~") .. "/.vscode/extensions/ms-vscode.cpptools-1.23.6-linux-x64/debugAdapters/bin/OpenDebugAD7",
-				-- command = vim.fn.expand("~") .. "/.vscode/extensions/ms-vscode.cpptools-1.23.5-linux-x64/debugAdapters/bin/OpenDebugAD7",
 			}
 
-			-- Add this inside your config function, after `local dap = require("dap")`
+			local gdb32 = "i686-elf-gdb"
+			local gdb64 = "x86_64-elf-gdb"
+
 			dap.adapters.gdb = {
 				type = "executable",
-				command = "i686-elf-gdb",
-				args = { "--interpreter=dap", "--eval-command", "set print pretty on" },
-				-- Fails, because my i686-elf-gdb is version 13.2, but needs > 14.0
-				-- Let's try to compile it
-			}
-
-			local function kernel_debug()
-				local cwd = vim.fn.getcwd()
-				local build_script = cwd .. "/build.sh"
-
-				if vim.fn.filereadable(build_script) == 0 then
-					error("Cannot find build.sh in workspace root")
-				end
-
-				print("[Kernel Debug] Running ./build.sh debug ...")
-
-				-- Run the command exactly as the user wants
-				local ret = os.execute(build_script .. " debug")
-
-				return "${workspaceFolder}/build/myos.bin"
-			end
-
-			local kdc = {
-				name = "Kernel Debug",
-				type = "gdb",
-				request = "attach",
-				program = function(callback) require("core.plugins_lazy.helper.dap").kernel_debug_async(callback) end, -- Optional, can specify ELF
-				cwd = "${workspaceFolder}",
-				remote = true,
-				target = "localhost:1234", -- the port QEMU listens on
-				stopAtEntry = false,
-
-				setupCommands = dap_helper.setupCommands,
-				-- setupCommands = {
-				-- 	{
-				-- 		text = "set sysroot /",
-				-- 		description = "Set sysroot to /",
-				-- 		ignoreFailures = true,
-				-- 	},
-				-- 	{
-				-- 		text = "set architecture i386:x86-32",
-				-- 		description = "Target architecture",
-				-- 		ignoreFailures = true,
-				-- 	},
-				-- },
+				command = gdb32,
+				args = {
+					"--interpreter=dap",
+				},
 			}
 
 			dap.configurations.c = {
@@ -350,19 +313,18 @@ return {
 					target = "localhost:1234", -- the port QEMU listens on
 					stopAtEntry = false,
 
-					setupCommands = dap_helper.setupCommands,
-					-- setupCommands = {
-					-- 	{
-					-- 		text = "set sysroot /",
-					-- 		description = "Set sysroot to /",
-					-- 		ignoreFailures = true,
-					-- 	},
-					-- 	{
-					-- 		text = "set architecture i386:x86-32",
-					-- 		description = "Target architecture",
-					-- 		ignoreFailures = true,
-					-- 	},
-					-- },
+					setupCommands = dap_helper.setupCommandsKernelDebug,
+				},
+
+				{
+					name = "Kernel Debug",
+					type = "gdb",
+					request = "attach",
+					program = dap_helper.kernel_debug, -- Optional, can specify ELF
+					cwd = "${workspaceFolder}",
+					remote = true,
+					target = "localhost:1234", -- the port QEMU listens on
+					stopAtEntry = false,
 				},
 			}
 

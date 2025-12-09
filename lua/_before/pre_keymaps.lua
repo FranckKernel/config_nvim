@@ -179,11 +179,6 @@ keymap.set("v", "x", '"_x', { noremap = true, silent = true })
 
 ----------------------Others ----------------------------
 -- Function to get the current file path and copy to clipboard
-local function copy_current_file_path()
-	local file_path = vim.fn.expand("%:p") -- Get the absolute path of the current file
-	vim.fn.setreg("+", file_path) -- Copy to system clipboard (+ register)
-	vim.api.nvim_echo({ { "File path copied: " .. file_path, "Normal" } }, false, {})
-end
 
 local function execute_current_file()
 	local file_path = vim.api.nvim_buf_get_name(0) -- Get the full file path
@@ -247,14 +242,12 @@ local function run_do_all()
 	vim.notify("Output:\n" .. output, vim.log.levels.INFO)
 end
 
-keymap.set("n", "<F1>", copy_current_file_path, opts("Copy current file path"))
-keymap.set("n", "<F2>", execute_current_file, opts("Stupidly execute current file"))
 -- keymap.set("n", "<F3>", run_do_all, opts("Run do all script (build, run, and more) {./aaa_doall.sh}"))
 keymap.set("n", "<F4>", RunCurrentFile, opts("Run current file"))
 keymap.set("n", "<F5>", run_build_script, opts("Run build script (No argument) - (build.sh)"))
 keymap.set("n", "<F6>", run_build_script_with_file, opts("Run build script (with this file as argument) - (build.sh $thisFile)"))
 keymap.set("n", "<F7>", run_build_test_script, opts("Run test script (with this file as argument) - (build_test.sh $thisFile)"))
-keymap.set("n", "<F8>", run_do_all, opts("Run do all script (build, run, and more) {./aaa_doall.sh}"))
+-- keymap.set("n", "<F8>", run_do_all, opts("Run do all script (build, run, and more) {./aaa_doall.sh}"))
 
 local oil_open = function() require("oil").open() end
 
@@ -359,11 +352,12 @@ keymap.set("n", "<C-w>=", "<C-w>=") -- make split windows equal width
 keymap.set("n", "<C-w>h", ":vsplit<CR>", opts("Vertical split"))
 keymap.set("n", "<C-w>v", ":split<CR>", opts("Horizontal split"))
 keymap.set("n", "<C-w>f", ":MaximizerToggle<CR>", { noremap = true, silent = true })
+keymap.set("n", "<F8>", ":MaximizerToggle<CR>", { noremap = true, silent = true })
 
 keymap.set("n", "<C-w>c", "<Cmd>tabnew<CR>", opts("New tab"))
 keymap.set("n", "<C-w>x", "<Cmd>tabclose<CR>", opts("Close tab"))
-keymap.set("n", "<C-w>b", "<Cmd>tabprevious<CR>", opts("Previous buffer"))
-keymap.set("n", "<C-w>n", "<Cmd>tabnext<CR>", opts("Next buffer"))
+keymap.set("n", "<C-w>b", "<Cmd>tabprevious<CR>", opts("Previous tab"))
+keymap.set("n", "<C-w>n", "<Cmd>tabnext<CR>", opts("Next tab"))
 
 keymap.set("n", "<C-Up>", ":resize +5<CR>", { noremap = true, silent = true })
 keymap.set("n", "<C-Down>", ":resize -5<CR>", { noremap = true, silent = true })

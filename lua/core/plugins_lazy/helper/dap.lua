@@ -309,6 +309,45 @@ M.setupCommands = {
 	{ text = "set debug-file-directory " .. vim.fn.getcwd() .. "/build", description = "Set debug symbols directory", ignoreFailures = false },
 }
 
+M.setupCommandsKernelDebug = {
+
+	-- { text = "-enable-pretty-printing", description = "Enable pretty printing", ignoreFailures = true },
+	-- { text = "set auto-load safe-path /", description = "Allow auto-loading of symbols", ignoreFailures = false },
+	-- { text = "directory " .. vim.fn.getcwd(), description = "Set source directory", ignoreFailures = false },
+	-- { text = "set debug-file-directory " .. vim.fn.getcwd() .. "/build", description = "Set debug symbols directory", ignoreFailures = false },
+	--
+	-- {
+	-- 	text = "break kernel_main",
+	-- 	description = "Break at kernel entry point",
+	-- 	ignoreFailures = false,
+	-- },
+	-- {
+	-- 	text = "continue",
+	-- 	description = "Run to kernel_main",
+	-- 	ignoreFailures = false,
+	-- },
+	-- {
+	-- 	text = "echo setup commands worked",
+	-- 	description = "Run to kernel_main",
+	-- 	ignoreFailures = false,
+	-- },
+
+	-- {
+	-- 	text = "set architecture i386:x86-32",
+	-- 	description = "Target architecture",
+	-- 	ignoreFailures = true,
+	-- },
+	-- {
+	-- 	text = "set sysroot /",
+	-- 	description = "Set sysroot to /",
+	-- 	ignoreFailures = true,
+	-- },
+}
+
+M.setupCommandsKernelDebug = {
+	-- They do not work, fuck that shit
+}
+
 function M.find_executable()
 	print("test")
 	debug_log("find_executable")
@@ -378,7 +417,7 @@ local function await_job(cmd, args)
 	end)
 end
 
-function M.kernel_debug_async(callback)
+function M.kernel_debug()
 	local cwd = vim.fn.getcwd()
 	local script = cwd .. "/build.sh"
 
@@ -388,48 +427,79 @@ function M.kernel_debug_async(callback)
 
 	print("[Kernel Debug] Running ./build.sh debug ...")
 
-	vim.fn.jobstart({ script, "debug" }, {
-		stdout_buffered = true,
-		stderr_buffered = true,
+	-- Use tmux send-keys to run build in Runner session
+	local build_cmd = "./build.sh debug"
 
-		on_stdout = function(_, data)
-			if data then
-				for _, line in ipairs(data) do
-					if line ~= "" then
-						print("[build.sh] " .. line)
-					end
-				end
-			end
-		end,
+	-- Option 1: Simple send-keys
+	os.execute(string.format("tmux send-keys -t Runner '%s' Enter", build_cmd:gsub("'", "'\"'\"'")))
 
-		on_stderr = function(_, data)
-			if data then
-				for _, line in ipairs(data) do
-					if line ~= "" then
-						print("[build.sh:ERR] " .. line)
-					end
-				end
-			end
-		end,
+	print("[Kernel Debug] Build command sent to Runner")
+	vim.wait(2000) -- <--- does not freeze Neovim
 
-		on_exit = function(_, code)
-			if code ~= 0 then
-				error("[Kernel Debug] Build failed with exit code " .. code)
-				return
-			end
+	return "${workspaceFolder}/build/myos.bin"
+end
 
-			print("[Kernel Debug] Build completed")
+function M.kernel_debug_async()
+	local cwd = vim.fn.getcwd()
+	local script = cwd .. "/build.sh"
 
-			local bin = cwd .. "/build/myos.bin"
-			if vim.fn.filereadable(bin) == 0 then
-				error("Binary not found: " .. bin)
-				return
-			end
+	if vim.fn.filereadable(script) == 0 then
+		error("Cannot find build.sh in workspace root")
+	end
 
-			-- RETURN to DAP: this is the important part
-			callback(bin)
-		end,
-	})
+	print("[Kernel Debug] Sending ./build.sh debug to Runner session...")
+
+	-- Async with vim.loop (doesn't block, no output capture)
+	-- This shouldn't be needed
+	local handle
+	handle = vim.loop.spawn("tmux", {
+		args = { "send-keys", "-t", "Runner", "./build.sh debug", "Enter" },
+		cwd = cwd,
+		detached = true, -- Run detached
+	}, function(code)
+		handle:close()
+		if code == 0 then
+			print("[Kernel Debug] Build command sent successfully to Runner")
+		else
+			print("[Kernel Debug] Failed to send command to Runner")
+		end
+	end)
+
+	return "${workspaceFolder}/build/myos.bin"
+end
+
+M.dap_tbreak_here = function()
+	-- Figure out filename and line
+	local file = vim.api.nvim_buf_get_name(0)
+	local line = vim.api.nvim_win_get_cursor(0)[1]
+
+	if file == nil or file == "" then
+		vim.notify("No file detected for tbreak", vim.log.levels.ERROR)
+		return
+	end
+
+	local dap = require("dap")
+
+	-- Make the GDB command
+	local cmd = string.format("tbreak %s:%d", file, line)
+	vim.notify("Setting temporary breakpoint: " .. cmd)
+
+	-- Ensure REPL is open
+	local repl_open = false
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		local buf = vim.api.nvim_win_get_buf(win)
+		local name = vim.api.nvim_buf_get_name(buf):lower()
+		if name:match("dap%-repl") then
+			repl_open = true
+			break
+		end
+	end
+	if not repl_open then
+		dap.repl.open()
+	end
+
+	-- Send command to GDB through DAP
+	dap.repl.execute(cmd)
 end
 
 return M
