@@ -418,14 +418,18 @@ local function await_job(cmd, args)
 end
 
 function M.kernel_debug()
-	local cwd = vim.fn.getcwd()
-	local script = cwd .. "/build.sh"
+	local pr = gu.find_project_root()
+	if pr == nil then
+		error("Could not find project root, it's nil")
+	end
+	gu.print_custom("project root = " .. vim.inspect(pr))
+	local script = pr .. "/build.sh"
 
 	if vim.fn.filereadable(script) == 0 then
 		error("Cannot find build.sh in workspace root")
 	end
 
-	print("[Kernel Debug] Running ./build.sh debug ...")
+	gu.print_custom("[Kernel Debug] Running ./build.sh debug ...")
 
 	-- Use tmux send-keys to run build in Runner session
 	local build_cmd = "./build.sh debug"
@@ -433,10 +437,10 @@ function M.kernel_debug()
 	-- Option 1: Simple send-keys
 	os.execute(string.format("tmux send-keys -t Runner '%s' Enter", build_cmd:gsub("'", "'\"'\"'")))
 
-	print("[Kernel Debug] Build command sent to Runner")
+	gu.print_custom("[Kernel Debug] Build command sent to Runner")
 	vim.wait(2000) -- <--- does not freeze Neovim
 
-	return "${workspaceFolder}/build/myos.bin"
+	return pr .. "/build/myos.bin"
 end
 
 function M.kernel_debug_async()

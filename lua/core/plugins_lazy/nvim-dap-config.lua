@@ -265,11 +265,13 @@ return {
 			local gdb32 = "i686-elf-gdb"
 			local gdb64 = "x86_64-elf-gdb"
 
-			dap.adapters.gdb = {
+			dap.adapters.gdb_kernel = {
 				type = "executable",
 				command = gdb32,
 				args = {
 					"--interpreter=dap",
+					"--init-command",
+					gu.find_project_root() .. "/.gdbinit", -- Load custom init
 				},
 			}
 
@@ -318,7 +320,7 @@ return {
 
 				{
 					name = "Kernel Debug",
-					type = "gdb",
+					type = "gdb_kernel",
 					request = "attach",
 					program = dap_helper.kernel_debug, -- Optional, can specify ELF
 					cwd = "${workspaceFolder}",
