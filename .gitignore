@@ -1,6 +1,7 @@
 lazy-lock.json
 no_tracking
 **/.nvim-session
+**/.*.pyc
 
 others/**
 
