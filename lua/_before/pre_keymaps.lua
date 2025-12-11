@@ -249,13 +249,10 @@ keymap.set("n", "<F6>", run_build_script_with_file, opts("Run build script (with
 keymap.set("n", "<F7>", run_build_test_script, opts("Run test script (with this file as argument) - (build_test.sh $thisFile)"))
 -- keymap.set("n", "<F8>", run_do_all, opts("Run do all script (build, run, and more) {./aaa_doall.sh}"))
 
-local oil_open = function() require("oil").open() end
-
 --
 -- Key mapping to source the current file (Only works for reloading nvim configuration)
 keymap.set("n", "<leader>sr", ":source %<CR>", { noremap = true, silent = true })
 keymap.set("n", "<leader>tt", ":NvimTreeToggle<CR>", { noremap = true, silent = true })
-keymap.set("n", "-", oil_open, { desc = "Open parent directory" })
 keymap.set("n", "+", ":Oil<CR>", { noremap = true, silent = true })
 
 --- Weird stuff
