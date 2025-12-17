@@ -18,5 +18,6 @@ return {
 
 		local oil_open = function() require("oil").open() end
 		vim.keymap.set("n", "-", oil_open, { desc = "Open parent directory" })
+		vim.keymap.set("n", "+", ":Oil<CR>", { noremap = true, silent = true })
 	end,
 }

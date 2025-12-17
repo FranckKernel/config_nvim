@@ -181,6 +181,7 @@ return {
 						"lazy%-lock.json*",
 						"%.bin$",
 						"%.dump$",
+						"%.pcm$",
 						"%build/.*",
 						"%.vim/.*",
 						"%old_vim/.*",

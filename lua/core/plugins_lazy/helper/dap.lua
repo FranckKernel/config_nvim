@@ -469,7 +469,7 @@ function M.kernel_debug_async()
 		end
 	end)
 
-	return "${workspaceFolder}/build/myos.bin"
+	return "${workspaceFolder}/build/myos.elf"
 end
 
 M.dap_tbreak_here = function()
@@ -486,7 +486,7 @@ M.dap_tbreak_here = function()
 
 	-- Make the GDB command
 	local cmd = string.format("tbreak %s:%d", file, line)
-	vim.notify("Setting temporary breakpoint: " .. cmd)
+	-- vim.notify("Setting temporary breakpoint: " .. cmd)
 
 	-- Ensure REPL is open
 	local repl_open = false

@@ -106,6 +106,8 @@ vim.g.csv_highlight_row = "y" -- Enable row highlighting
 vim.filetype.add({
 	extension = {
 		cl = "opencl", -- Force .cl files to use opencl filetype
+
+		ixx = "cpp", -- Simpler way to map .ixx to cpp
 	},
 })
 

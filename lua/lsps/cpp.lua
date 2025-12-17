@@ -1,11 +1,12 @@
--- lua/core/lsps/c.lua
+-- lua/core/lsps/cpp.lua
 -- Note the c23 fallback flags. If you have an oldass pc, need to change it
+
+-- This file might be unneeded garbage. But, maybe it would be cool to split it idk
 M = {}
 
 M.config = {
 	cmd = {
-		"/usr/bin/clangd",
-		-- "/usr/local/bin/clangd",
+		"clangd",
 		"--background-index",
 		"--clang-tidy",
 		"--completion-style=detailed",
@@ -15,7 +16,7 @@ M.config = {
 		"--log=verbose",
 		"--query-driver=/opt/rocm/llvm/bin/*",
 		"--fallback-style=llvm",
-		"--experimental-modules-support",
+		-- "--experimental-modules-support",
 	},
 	init_options = {
 		clangdFileStatus = true,
@@ -32,7 +33,7 @@ M.config = {
 			-- Keep OpenCL flags only for actual OpenCL files
 		},
 	},
-	filetypes = { "c", "h", "cpp", "objc", "objcpp", "cppm", "ixx" }, -- cppm and ixx are for cpp modules
+	filetypes = { "c", "h", "cpp", "objc", "objcpp" }, -- Removed "x" and "opencl"
 	root_dir = require("lspconfig.util").root_pattern(
 		"compile_commands.json",
 		".clang-format",
@@ -49,19 +50,9 @@ M.config = {
 	},
 	on_attach = function(client, bufnr)
 		local lsp_helper = require("lsps.helper.lsp_config_helper")
-		print("c lsp attached")
+		print("cpp lsp attached")
 		lsp_helper.add_keybinds()
 	end,
 }
-
--- Separate configuration for OpenCL files
-M.opencl_config = vim.deepcopy(M.config)
-M.opencl_config.init_options.fallbackFlags = {
-	"-I/opt/rocm/opencl/include",
-	"-I/usr/include/clc",
-	"-cl-std=CL2.0",
-	"-xcl", -- Only apply OpenCL mode for .cl files
-}
-M.opencl_config.filetypes = { "opencl" } -- Only for OpenCL files
 
 return M

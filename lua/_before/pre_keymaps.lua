@@ -252,8 +252,6 @@ keymap.set("n", "<F7>", run_build_test_script, opts("Run test script (with this 
 --
 -- Key mapping to source the current file (Only works for reloading nvim configuration)
 keymap.set("n", "<leader>sr", ":source %<CR>", { noremap = true, silent = true })
-keymap.set("n", "<leader>tt", ":NvimTreeToggle<CR>", { noremap = true, silent = true })
-keymap.set("n", "+", ":Oil<CR>", { noremap = true, silent = true })
 
 --- Weird stuff
 

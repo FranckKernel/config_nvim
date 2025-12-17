@@ -11,6 +11,7 @@ return {
 				auto_install = false, -- disable auto_install here since we'll handle manually
 				highlight = {
 					enable = true,
+					-- not that smart for c++ modules. It will not color the keywords
 					-- additional_vim_regex_highlighting = false, -- maybe not necessary
 				},
 				indent = { enable = true, disable = { "latex" } },
