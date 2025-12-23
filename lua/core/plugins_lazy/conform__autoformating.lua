@@ -54,6 +54,8 @@ return {
 					c = { "clang_format" },
 					cpp = { "clang_format" },
 					javascript = { "prettier", stop_after_first = true },
+					json = { "jq" }, -- or "prettier" if you have Node/Prettier installed
+
 					-- add more filetypes here
 				},
 				format_on_save = {
