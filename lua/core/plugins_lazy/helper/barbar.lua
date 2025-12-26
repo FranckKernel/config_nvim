@@ -176,7 +176,7 @@ function M.reorder_buffer_to_json(path)
 	local current_state = M.get_current_buffer_state()
 	local out = ggu().print_custom
 
-	local debug = true
+	local debug = false
 
 	if debug then
 		out("Current State\n")
