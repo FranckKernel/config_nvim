@@ -14,7 +14,7 @@ M.config = {
 		"--cross-file-rename",
 		"--header-insertion=iwyu",
 		"--log=verbose",
-		"--query-driver=/opt/rocm/llvm/bin/*",
+		-- "--query-driver=/opt/rocm/llvm/bin/*",
 		"--fallback-style=llvm",
 		-- "--experimental-modules-support",
 	},

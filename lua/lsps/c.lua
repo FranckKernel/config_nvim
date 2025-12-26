@@ -15,7 +15,7 @@ M.config = {
 		"--log=verbose",
 		"--query-driver=/opt/rocm/llvm/bin/*",
 		"--fallback-style=llvm",
-		"--experimental-modules-support",
+		-- "--experimental-modules-support",
 	},
 	init_options = {
 		clangdFileStatus = true,

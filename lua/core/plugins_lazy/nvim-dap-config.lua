@@ -267,7 +267,7 @@ return {
 
 			dap.adapters.gdb_kernel = {
 				type = "executable",
-				command = gdb32,
+				command = gdb64,
 				args = {
 					"--interpreter=dap",
 					"--init-command",
