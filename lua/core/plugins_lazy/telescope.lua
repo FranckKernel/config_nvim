@@ -180,7 +180,6 @@ return {
 						"%.o$",
 						"lazy%-lock.json*",
 						"%.bin$",
-						"%.dump$",
 						"%.pcm$",
 						"%build/.*",
 						"%.vim/.*",
@@ -230,6 +229,14 @@ return {
 						override_generic_sorter = true,
 						override_file_sorter = true,
 						case_mode = "smart_case",
+					},
+					live_grep = {
+						additional_args = function(_)
+							return {
+								"--glob",
+								"!*.dump",
+							}
+						end,
 					},
 				},
 			})

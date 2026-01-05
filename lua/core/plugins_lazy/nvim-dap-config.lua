@@ -309,7 +309,7 @@ return {
 					name = "Attach to Remote GDB :1234",
 					type = "gdb_kernel",
 					request = "attach",
-					program = "${workspaceFolder}/build/myos.elf", -- Optional, can specify ELF
+					program = "${workspaceFolder}/kernel.elf", -- Optional, can specify ELF
 					cwd = "${workspaceFolder}",
 					remote = true,
 					target = "localhost:1234", -- the port QEMU listens on
