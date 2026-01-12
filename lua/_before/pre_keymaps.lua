@@ -189,15 +189,50 @@ function RunCurrentFile()
 	local filepath = vim.api.nvim_buf_get_name(0) -- Get the full file path
 	local file_ext = vim.fn.fnamemodify(filepath, ":e") -- Get the file extension
 
+	if filepath == "" then
+		print("No file to run")
+		return
+	end
+
 	-- Get the current directory for the terminal
 	local current_dir = vim.fn.getcwd()
 	local basename = vim.fn.fnamemodify(filepath, ":t:r") -- Get filename without extension
 
+	-- Dictionary of extension -> build/run function
+	local runners = {
+		sh = function() return "bash " .. vim.fn.shellescape(filepath) end,
+		c = function() return string.format("gcc %s -o %s.out && ./%s.out", vim.fn.shellescape(filepath), basename, basename) end,
+		cpp = function() return string.format("g++ %s -o %s.out && ./%s.out", vim.fn.shellescape(filepath), basename, basename) end,
+		py = function() return "python3 " .. vim.fn.shellescape(filepath) end,
+		java = function()
+			local home = vim.fn.expand("$HOME")
+			local AutoMakeJava_location = "/Documents/University (Real)/Semester 10/Comp 303/AutomakeJava"
+			local autoMakeScript = home .. AutoMakeJava_location .. "/src/automake.py"
+			return "python3 " .. vim.fn.shellescape(autoMakeScript) .. " " .. vim.fn.shellescape(filepath)
+		end,
+		zig = function()
+			local executable = basename
+			local build_cmd = "zig build-exe " .. vim.fn.shellescape(filepath) .. " -femit-bin=" .. vim.fn.shellescape(executable)
+			local execute_command = current_dir .. "/" .. executable
+			return build_cmd .. " && " .. execute_command
+		end,
+	}
+
+	-- Early exit if extension not supported
+	local runner = runners[file_ext]
+	if not runner then
+		print("File type ." .. file_ext .. " not supported for running with F4")
+		return
+	end
+
 	-- Floating terminal window setup
 	local buf = vim.api.nvim_create_buf(false, true) -- create scratch buffer, no file, hidden on close
 
-	local width = math.floor(vim.o.columns * 0.8)
-	local height = math.floor(vim.o.lines * 0.8)
+	local width_ratio = 0.8 -- Could be a config variable
+	local height_ratio = 0.8 -- Could be a config variable
+	local width = math.floor(vim.o.columns * width_ratio)
+	local height = math.floor(vim.o.lines * height_ratio)
+
 	local row = math.floor((vim.o.lines - height) / 2)
 	local col = math.floor((vim.o.columns - width) / 2)
 
@@ -213,45 +248,36 @@ function RunCurrentFile()
 
 	local win = vim.api.nvim_open_win(buf, true, options)
 
-	if file_ext == "sh" then
-		-- Run Bash script
-		vim.cmd("!bash " .. vim.fn.shellescape(filepath))
-	elseif file_ext == "c" then
-		-- Compile and run C file
-		local executable = vim.fn.shellescape(filepath:gsub("%.c$", ""))
-		vim.cmd("!gcc " .. vim.fn.shellescape(filepath) .. " -o " .. executable .. " && " .. executable)
-	elseif file_ext == "cpp" then
-		-- Compile and run C file
-		local executable = vim.fn.shellescape(filepath:gsub("%.cpp$", ""))
-		vim.cmd("!g++ " .. vim.fn.shellescape(filepath) .. " -o " .. executable .. " && " .. executable)
-	elseif file_ext == "py" then
-		-- Run Python script
-		vim.cmd("!python3 " .. vim.fn.shellescape(filepath))
-	elseif file_ext == "java" then
-		local home = vim.fn.expand("$HOME")
-		local AutoMakeJava_location = "/Documents/University (Real)/Semester 10/Comp 303/AutomakeJava"
-		local autoMakeScript = home .. AutoMakeJava_location .. "/src/automake.py"
-		vim.cmd("!python3 " .. vim.fn.shellescape(autoMakeScript) .. " " .. vim.fn.shellescape(filepath))
-	elseif file_ext == "zig" then
-		local executable = basename
+	-- Get the command from the runner function
+	local command = runner()
 
-		-- Build the Zig executable
-		local build_cmd = "zig build-exe " .. vim.fn.shellescape(filepath) .. " -femit-bin=" .. vim.fn.shellescape(executable)
-		local build_output = vim.fn.system(build_cmd)
-		if build_output ~= "" then
-			vim.notify(build_output, vim.log.levels.INFO) -- show compiler messages
-		end
+	-- Run the command in the terminal
+	vim.fn.termopen(command, {
+		on_exit = function()
+			-- Switch to normal mode when command finishes
+			vim.schedule(function() vim.cmd("stopinsert") end)
+		end,
+	})
 
-		local execute_command = executable
-
-		vim.fn.termopen({ execute_command })
-		-- Optional: make it scrollable and normal
-		vim.api.nvim_buf_set_option(buf, "buflisted", false)
-
-		-- Start terminal in the floating window
-	else
-		print_custom("File type not supported for running with F4")
+	local keybind_opts = function(desc)
+		--
+		return { buffer = buf, noremap = true, silent = true, desc = desc }
 	end
+	local exit_term = function()
+		if vim.api.nvim_win_is_valid(win) then
+			vim.api.nvim_win_close(win, true)
+		end
+	end
+
+	-- Setup close on Enter
+	vim.keymap.set("n", "<CR>", exit_term, keybind_opts("Exit on Enter"))
+	vim.keymap.set("n", "<Esc>", exit_term, keybind_opts("Exit on Escape"))
+	vim.keymap.set("n", "jk", exit_term, keybind_opts("Exit on jk"))
+	vim.keymap.set("n", "q", exit_term, keybind_opts("Exit on q"))
+
+	-- Start in insert mode and hide buffer from list
+	vim.cmd("startinsert")
+	vim.api.nvim_buf_set_option(buf, "buflisted", false)
 end
 
 -- Function to run the build script with the current file
