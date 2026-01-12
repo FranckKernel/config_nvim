@@ -34,7 +34,7 @@ M.config = {
 	},
 	filetypes = { "c", "h", "cpp", "objc", "objcpp", "cppm", "ixx" }, -- cppm and ixx are for cpp modules
 	root_dir = require("lspconfig.util").root_pattern(
-		"compile_commands.json",
+		-- "compile_commands.json",
 		".clang-format",
 		".clangd",
 		"compile_flags.txt",

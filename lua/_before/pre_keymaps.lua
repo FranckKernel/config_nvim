@@ -189,6 +189,30 @@ function RunCurrentFile()
 	local filepath = vim.api.nvim_buf_get_name(0) -- Get the full file path
 	local file_ext = vim.fn.fnamemodify(filepath, ":e") -- Get the file extension
 
+	-- Get the current directory for the terminal
+	local current_dir = vim.fn.getcwd()
+	local basename = vim.fn.fnamemodify(filepath, ":t:r") -- Get filename without extension
+
+	-- Floating terminal window setup
+	local buf = vim.api.nvim_create_buf(false, true) -- create scratch buffer, no file, hidden on close
+
+	local width = math.floor(vim.o.columns * 0.8)
+	local height = math.floor(vim.o.lines * 0.8)
+	local row = math.floor((vim.o.lines - height) / 2)
+	local col = math.floor((vim.o.columns - width) / 2)
+
+	local options = {
+		relative = "editor",
+		width = width,
+		height = height,
+		row = row,
+		col = col,
+		style = "minimal",
+		border = "rounded",
+	}
+
+	local win = vim.api.nvim_open_win(buf, true, options)
+
 	if file_ext == "sh" then
 		-- Run Bash script
 		vim.cmd("!bash " .. vim.fn.shellescape(filepath))
@@ -208,6 +232,23 @@ function RunCurrentFile()
 		local AutoMakeJava_location = "/Documents/University (Real)/Semester 10/Comp 303/AutomakeJava"
 		local autoMakeScript = home .. AutoMakeJava_location .. "/src/automake.py"
 		vim.cmd("!python3 " .. vim.fn.shellescape(autoMakeScript) .. " " .. vim.fn.shellescape(filepath))
+	elseif file_ext == "zig" then
+		local executable = basename
+
+		-- Build the Zig executable
+		local build_cmd = "zig build-exe " .. vim.fn.shellescape(filepath) .. " -femit-bin=" .. vim.fn.shellescape(executable)
+		local build_output = vim.fn.system(build_cmd)
+		if build_output ~= "" then
+			vim.notify(build_output, vim.log.levels.INFO) -- show compiler messages
+		end
+
+		local execute_command = executable
+
+		vim.fn.termopen({ execute_command })
+		-- Optional: make it scrollable and normal
+		vim.api.nvim_buf_set_option(buf, "buflisted", false)
+
+		-- Start terminal in the floating window
 	else
 		print_custom("File type not supported for running with F4")
 	end
