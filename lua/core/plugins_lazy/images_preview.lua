@@ -4,6 +4,10 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 	callback = function() vim.bo.filetype = "image" end,
 })
 
+if true then
+	return {}
+end
+
 return {
 	{
 		"3rd/image.nvim",

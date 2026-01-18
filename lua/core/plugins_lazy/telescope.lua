@@ -178,6 +178,7 @@ return {
 						"%.git/.*",
 						"%.nvim%-session/.*",
 						"%.o$",
+						"%.a$",
 						"lazy%-lock.json*",
 						"%.bin$",
 						"%.pcm$",
