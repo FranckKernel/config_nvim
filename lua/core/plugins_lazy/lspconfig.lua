@@ -130,7 +130,7 @@ return {
 			lspconfig.asm_lsp.setup(asm_lsp.config)
 			lspconfig.clangd.setup(c_lsp.config)
 			lspconfig.opencl_ls.setup(opencl_lsp.config)
-			-- lspconfig.zls.setup(zig_lsp.config) -- already configured by native
+			lspconfig.zls.setup(zig_lsp.config) -- already configured by native
 			lspconfig.rust_analyzer.setup(rust_lsp.config)
 
 			-- lspconfig.opencl_language_server.setup() -- wrong name?

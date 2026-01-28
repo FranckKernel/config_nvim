@@ -93,8 +93,11 @@ vim.opt.sessionoptions = { -- required
 }
 -- let g:gitgutter_enabled = 0
 
-vim.cmd("set verbosefile=$HOME/.config/nvim_logs/nvim_log.lua")
-vim.cmd("set verbose=12") -- maximum verbosity
+local preconfig = require("_before.pre_config")
+if preconfig.verbose_log then
+	vim.cmd("set verbosefile=$HOME/.config/nvim_logs/nvim_log.lua")
+	vim.cmd("set verbose=12") -- maximum verbosity
+end
 
 vim.opt.undofile = true -- Enable persistent undo
 vim.opt.undodir = vim.fn.stdpath("data") .. "/undo" -- Set undo directory

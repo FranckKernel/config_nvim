@@ -11,6 +11,8 @@ M.useMergedLspConfig = false
 M.use_git_confict = true
 M.use_system_clipboard = false
 M.word_ws = true
+
+M.verbose_log = false
 -- etc.
 
 -- Function to print the current config state
