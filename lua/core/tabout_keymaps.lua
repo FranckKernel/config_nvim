@@ -59,7 +59,7 @@ local function print_node_info(node, cursor_row, cursor_col)
 end
 
 local function get_enclosing_pair_node()
-	local node = ts.get_node_at_cursor()
+	local node = ts.get_node()
 	local delimiters = {
 		["("] = ")",
 		["["] = "]",
