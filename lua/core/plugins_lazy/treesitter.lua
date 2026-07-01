@@ -4,11 +4,13 @@ return {
 		version = false,
 		event = { "BufReadPost", "BufNewFile" },
 		config = function()
-			require("nvim-treesitter.configs").setup({
+			require("nvim-treesitter").setup({
 				ensure_installed = {}, -- start empty, no upfront installs
 				-- ensure_installed = { "asm", "c", "cpp", "lua", "rust", "vim", "html", "python", "java", "css", "xml" },
 				sync_install = false,
-				auto_install = false, -- disable auto_install here since we'll handle manually
+				auto_install = true,
+				-- It's not so bad to have treesitter be managed another way
+				-- disable auto_install here since we'll handle manually
 				highlight = {
 					enable = true,
 					-- not that smart for c++ modules. It will not color the keywords
@@ -17,31 +19,31 @@ return {
 				indent = { enable = true, disable = { "latex" } },
 			})
 
-			local parsers = require("nvim-treesitter.parsers")
-			local install = require("nvim-treesitter.install")
-
-			vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-				callback = function()
-					local ft = vim.bo.filetype
-
-					-- Prevent trying to install unsupported or unknown filetypes
-					if not ft or ft == "" then
-						return
-					end
-
-					local lang = parsers.ft_to_lang(ft)
-
-					-- Don't install if no parser exists for this language
-					if not parsers.get_parser_configs()[lang] then
-						return
-					end
-
-					-- Only install if not already available
-					if not parsers.has_parser(lang) then
-						vim.schedule(function() install.ensure_installed({ lang }) end)
-					end
-				end,
-			})
+			-- local parsers = require("nvim-treesitter.parsers")
+			-- local install = require("nvim-treesitter.install")
+			--
+			-- vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+			-- 	callback = function()
+			-- 		local ft = vim.bo.filetype
+			--
+			-- 		-- Prevent trying to install unsupported or unknown filetypes
+			-- 		if not ft or ft == "" then
+			-- 			return
+			-- 		end
+			--
+			-- 		local lang = parsers.ft_to_lang(ft)
+			--
+			-- 		-- Don't install if no parser exists for this language
+			-- 		if not parsers.get_parser_configs()[lang] then
+			-- 			return
+			-- 		end
+			--
+			-- 		-- Only install if not already available
+			-- 		if not parsers.has_parser(lang) then
+			-- 			vim.schedule(function() install.ensure_installed({ lang }) end)
+			-- 		end
+			-- 	end,
+			-- })
 
 			vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 				pattern = "*.dump",

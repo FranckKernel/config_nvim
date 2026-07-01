@@ -6,7 +6,8 @@ local function opts(desc) return { noremap = true, silent = true, desc = desc } 
 
 -- =================================== TABOUT =========================
 
-local ts_utils = require("nvim-treesitter.ts_utils")
+-- local ts = require("nvim-treesitter.ts_utils")
+local ts = vim.treesitter
 local gu = require("_before.general_utils")
 
 local DEBUG = false
@@ -58,7 +59,7 @@ local function print_node_info(node, cursor_row, cursor_col)
 end
 
 local function get_enclosing_pair_node()
-	local node = ts_utils.get_node_at_cursor()
+	local node = ts.get_node_at_cursor()
 	local delimiters = {
 		["("] = ")",
 		["["] = "]",
