@@ -188,6 +188,16 @@ return {
 		-- 	end,
 		-- })
 
+		vim.api.nvim_create_user_command("LspInfo", ":checkhealth vim.lsp", { desc = "Alias to :checkhealth vim.lsp" })
+		vim.api.nvim_create_user_command("LspLog", function()
+			local log_path = vim.lsp.log.get_filename() -- This is the new, non-deprecated function
+			if log_path and vim.fn.filereadable(log_path) == 1 then
+				vim.cmd("edit " .. log_path)
+			else
+				vim.notify("LSP log file not found", vim.log.levels.WARN)
+			end
+		end, { desc = "Open LSP log file" })
+
 		-- End of config
 	end,
 }

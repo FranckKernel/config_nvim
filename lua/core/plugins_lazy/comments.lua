@@ -24,16 +24,17 @@ return {
 	"numToStr/Comment.nvim",
 	lazy = true,
 	keys = {
-		"gcc", -- line comment toggle (normal mode)
-		"gbc", -- block comment toggle (normal mode)
-		"gc", -- operator pending line comment (normal + visual)
-		"gb", -- operator pending block comment (normal + visual)
-		"gco", -- add comment line below (normal mode)
-		"gcO", -- add comment line above (normal mode)
-		"gcA", -- add comment at end of line (normal mode)
+		{ "gcc", mode = "n", desc = "Toggle comment line" },
+		{ "gbc", mode = "n", desc = "Toggle block comment" },
+		{ "gc", mode = { "n", "v" }, desc = "Comment operator" },
+		{ "gb", mode = { "n", "v" }, desc = "Block comment operator" },
+		{ "gco", mode = "n", desc = "Comment below" },
+		{ "gcO", mode = "n", desc = "Comment above" },
+		{ "gcA", mode = "n", desc = "Comment end of line" },
 	},
 	config = function()
-		require("Comment").setup()
+		local comment = require("Comment")
+		comment.setup()
 
 		x = 5
 
