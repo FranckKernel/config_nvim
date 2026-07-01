@@ -47,6 +47,9 @@ return {
 		local rust_lsp = require("lsps.rust")
 
 		local latex_lsp = require("lsps.latex")
+		local go_lsp = require("lsps.go")
+
+		local iverilog_lsp = require("lsps.verilog")
 
 		if use_mason then
 			local mason_lspconfig = require("mason-lspconfig")
@@ -59,9 +62,12 @@ return {
 					"zls",
 					"rust_analyzer",
 
+					"gopls",
+
 					"texlab",
 					"solargraph",
 					"ts_ls",
+					"svls",
 				},
 				automatic_installation = true, -- or true if you want automatic installs
 				-- automatic_enable = { "pyright", "lua_ls", exclude = {} },
@@ -95,10 +101,14 @@ return {
 			vim.lsp.config("lua_ls", extend_capabilities(lua_lsp.config))
 			vim.lsp.config("pyright", extend_capabilities(python_lsp.config))
 
+			vim.lsp.config("svls", extend_capabilities(iverilog_lsp.config))
+
 			-- clangd, rust and asm should be moved here
 			vim.lsp.config("zls", extend_capabilities(zig_lsp.config))
 
-			vim.lsp.enable({ "lua_ls", "pyright", "zls" })
+			vim.lsp.config("gopls", extend_capabilities({}))
+
+			vim.lsp.enable({ "lua_ls", "pyright", "zls", "gopls" })
 
 			-- It seems the others don't quite works if i set them up like that
 			local they_work = false
@@ -140,6 +150,8 @@ return {
 			lspconfig.ts_ls.setup({})
 			lspconfig.gopls.setup({})
 			lspconfig.tailwindcss.setup({})
+
+			lspconfig.svls.setup(iverilog_lsp.config)
 
 			-- end of if statement
 		end
