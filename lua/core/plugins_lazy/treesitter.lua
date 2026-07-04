@@ -1,22 +1,63 @@
 return {
 	{
 		"nvim-treesitter/nvim-treesitter",
+		build = ":TSUpdate",
+		-- branch = "master",
 		version = false,
 		event = { "BufReadPost", "BufNewFile" },
 		config = function()
 			require("nvim-treesitter").setup({
-				ensure_installed = {}, -- start empty, no upfront installs
-				-- ensure_installed = { "asm", "c", "cpp", "lua", "rust", "vim", "html", "python", "java", "css", "xml" },
-				sync_install = false,
-				auto_install = true,
-				-- It's not so bad to have treesitter be managed another way
-				-- disable auto_install here since we'll handle manually
-				highlight = {
-					enable = true,
-					-- not that smart for c++ modules. It will not color the keywords
-					-- additional_vim_regex_highlighting = false, -- maybe not necessary
-				},
 				indent = { enable = true, disable = { "latex" } },
+			})
+
+			vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+				pattern = "*.dump",
+				callback = function() vim.bo.filetype = "asm" end,
+			})
+
+			local nvim_treesitter = require("nvim-treesitter")
+			local function is_installed(lang)
+				local installed = nvim_treesitter.get_installed()
+				return vim.list_contains(installed, lang)
+			end
+
+			local function has_parser(lang) return vim.list_contains(nvim_treesitter.get_available(), lang) end
+
+			vim.api.nvim_create_autocmd("FileType", {
+				callback = function(args)
+					local ft = vim.bo[args.buf].filetype
+					local lang = vim.treesitter.language.get_lang(ft)
+
+					if not lang then
+						return
+					end
+
+					-- 1. ensure parser exists
+					if is_installed(lang) then
+						vim.treesitter.start(args.buf, lang)
+
+					-- Step 5: Check if the parser is available (exists in treesitter repo)
+					elseif not has_parser(lang) then
+						return -- Can't install if it doesn't exist
+					end
+
+					nvim_treesitter.install(lang):await(function()
+						-- Only enable if the buffer is still loaded
+						if not vim.api.nvim_buf_is_loaded(args.buf) then
+							return
+						end
+						vim.treesitter.start(args.buf, lang)
+					end)
+
+					-- pcall(vim.treesitter.start, args.buf, lang)
+
+					-- Folds
+					-- vim.wo[0][0].foldexpr = "v:lua.vim.treesitter.foldexpr()"
+					-- vim.wo[0][0].foldmethod = "expr"
+
+					-- Indentation
+					-- vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+				end,
 			})
 
 			-- local parsers = require("nvim-treesitter.parsers")
@@ -44,11 +85,6 @@ return {
 			-- 		end
 			-- 	end,
 			-- })
-
-			vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-				pattern = "*.dump",
-				callback = function() vim.bo.filetype = "asm" end,
-			})
 		end,
 	},
 }

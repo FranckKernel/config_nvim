@@ -32,9 +32,6 @@ require("lazy").setup({
 
 		lazy = true,
 	},
-	-- {
-	-- 	"nvim-treesitter/nvim-treesitter",
-	-- },
 
 	{ -- autocomplete () {}
 		"windwp/nvim-autopairs",
