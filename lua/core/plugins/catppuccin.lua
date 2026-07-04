@@ -83,3 +83,7 @@ return {
 --   text = "#cdd6f5",
 --   yellow = "#f9e2b0"
 -- }
+
+-- To get information about the colors of stuff, here's two relevent example
+-- :lua print(vim.inspect(require("catppuccin.palettes").get_palette("mocha")))
+-- :lua print(vim.inspect(require("cmp").get_config().window))
