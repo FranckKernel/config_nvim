@@ -159,7 +159,7 @@ return {
 	dir = "~/.config/nvim/nvim-possession",
 	branch = "main",
 	dependencies = {
-		"ibhagwan/fzf-lua",
+		"nvim-telescope/telescope.nvim",
 		{
 			"tiagovla/scope.nvim",
 			lazy = false,

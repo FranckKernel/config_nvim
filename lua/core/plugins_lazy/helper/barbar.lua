@@ -71,7 +71,6 @@ local function write_json_file(path, json)
 end
 
 function M.save_buff_order(path)
-	ggu().send_notification("save buf order")
 	local snapshot = M.get_current_buffer_state()
 	local json = vim.json.encode(snapshot, { indent = "\t" })
 
