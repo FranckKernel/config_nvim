@@ -99,6 +99,7 @@ return {
 				start_delay = 3000,
 			})
 			vim.lsp.config("lua_ls", extend_capabilities(lua_lsp.config))
+			vim.lsp.config("lua_ls", extend_capabilities(lua_lsp.config))
 			vim.lsp.config("pyright", extend_capabilities(python_lsp.config))
 
 			vim.lsp.config("svls", extend_capabilities(iverilog_lsp.config))
@@ -170,6 +171,27 @@ return {
 			underline = true,
 			update_in_insert = false,
 			severity_sort = true,
+		})
+
+		vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
+			border = "rounded",
+			focusable = true,
+			max_width = 80,
+			max_height = 20,
+
+			-- floating window highlight groups
+			on_open = function(win, buf)
+				vim.api.nvim_set_option_value("winhighlight", "NormalFloat:NormalFloat,FloatBorder:FloatBorder", { win = win })
+			end,
+		})
+
+		vim.api.nvim_set_hl(0, "LspHoverNormal", {
+			bg = "NONE",
+		})
+
+		vim.api.nvim_set_hl(0, "LspHoverBorder", {
+			fg = "#89b4fa",
+			bg = "NONE",
 		})
 
 		-- local lsp_helper = require("lsps.helper.lsp_config_helper")

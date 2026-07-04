@@ -5,9 +5,13 @@ return {
 		"nvim-treesitter/nvim-treesitter", -- Required for some UI like outline
 		"neovim/nvim-lspconfig",
 	},
+	cmd = {
+		"Lspsaga",
+		"Lspsaga hover_doc",
+	},
 	keys = {
 		{
-			"$",
+			"<Leader>Lg",
 			"<cmd>Lspsaga hover_doc<CR>",
 			desc = "Hover Information",
 		},
@@ -64,6 +68,13 @@ return {
 					quit = "q",
 				},
 			},
+
+			hover = {
+				-- This is key - enable treesitter in hover
+				enable_treesitter = true,
+				-- Use markdown rendering
+				-- render = "markdown",
+			},
 			diagnostic = {
 				max_width = 0.8,
 				max_height = 0.6,
@@ -84,6 +95,17 @@ return {
 					quit_in_show = { "q", "<ESC>" },
 				},
 			},
+		})
+
+		vim.api.nvim_create_autocmd("User", {
+			pattern = "LspsagaHoverOpen",
+			callback = function()
+				local bufnr = vim.api.nvim_get_current_buf()
+				local ft = vim.bo[bufnr].filetype
+				if ft and ft ~= "" then
+					pcall(vim.treesitter.start, bufnr, ft)
+				end
+			end,
 		})
 	end,
 }

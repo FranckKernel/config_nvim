@@ -26,7 +26,7 @@ return {
 				return {
 					-- Force transparency in all float elements
 					NormalFloat = { bg = "NONE" },
-					FloatBorder = { bg = "NONE", fg = colors.blue },
+					FloatBorder = { bg = "None", fg = colors.blue },
 					TelescopeNormal = { bg = "NONE" },
 					TelescopeBorder = { bg = "NONE", fg = colors.blue },
 					WhichKeyFloat = { bg = "NONE" },
@@ -40,6 +40,7 @@ return {
 		vim.cmd.colorscheme("catppuccin")
 
 		local extra = false
+		-- not needed
 		if extra then
 			-- Additional fixes for specific plugins
 			vim.api.nvim_create_autocmd("ColorScheme", {

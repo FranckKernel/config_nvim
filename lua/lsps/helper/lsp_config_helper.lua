@@ -217,6 +217,92 @@ M.attach_lsp_to_all_buffers = function()
 	end
 end
 
+function lsp_hover()
+	local params = vim.lsp.util.make_position_params()
+	vim.lsp.buf_request(0, "textDocument/hover", params, function(err, result)
+		if err or not result or not result.contents then
+			return
+		end
+
+		-- Get raw content
+		local content = result.contents
+		local lines = {}
+
+		if type(content) == "table" and content.value then
+			lines = vim.split(content.value, "\n")
+		elseif type(content) == "string" then
+			lines = vim.split(content, "\n")
+		else
+			lines = vim.split(vim.inspect(content), "\n")
+		end
+
+		lines = vim.lsp.util.trim_empty_lines(lines)
+		if vim.tbl_isempty(lines) then
+			return
+		end
+
+		-- Detect filetype from current buffer
+		local ft = vim.bo.filetype
+
+		-- Calculate width
+		local width = 0
+		for _, line in ipairs(lines) do
+			width = math.max(width, vim.fn.strdisplaywidth(line))
+		end
+		width = math.min(width + 4, 80)
+		local height = math.min(#lines + 2, 25)
+
+		-- Create buffer
+		local bufnr = vim.api.nvim_create_buf(false, true)
+		vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+
+		-- Set filetype to current buffer's language for syntax highlighting
+		vim.api.nvim_buf_set_option(bufnr, "filetype", ft)
+
+		-- Enable treesitter for this language
+		pcall(vim.treesitter.start, bufnr, ft)
+
+		-- Open window
+		local win = vim.api.nvim_open_win(bufnr, false, {
+			relative = "cursor",
+			width = width,
+			height = height,
+			col = 1,
+			row = 1,
+			style = "minimal",
+			border = "rounded",
+			focusable = true, -- Make it focusable for interactions
+		})
+
+		-- Auto-close on cursor move, but allow interaction
+		local close_timer
+		vim.api.nvim_create_autocmd("CursorMoved", {
+			callback = function()
+				-- Don't close if cursor is in the hover window
+				local current_win = vim.api.nvim_get_current_win()
+				if current_win == win then
+					return
+				end
+				if vim.api.nvim_win_is_valid(win) then
+					vim.api.nvim_win_close(win, true)
+				end
+			end,
+			once = false, -- Keep running
+		})
+
+		-- Close on escape
+		vim.api.nvim_create_autocmd("BufLeave", {
+			buffer = bufnr,
+			callback = function()
+				if vim.api.nvim_win_is_valid(win) then
+					vim.api.nvim_win_close(win, true)
+				end
+			end,
+			once = true,
+		})
+	end)
+end
+
 M.add_keybinds = function(client, bufnr)
 	local keymap = vim.keymap
 	local hl = "core.plugins_lazy.helper.lsp_keybind"
@@ -225,7 +311,9 @@ M.add_keybinds = function(client, bufnr)
 	local keybind_helper = require(hl)
 
 	-- LSP Information
-	keymap.set("n", "<leader>Lg", keybind_helper.safe_lsp_call("hover"), opts("Show LSP hover info"))
+	keymap.set("n", "$", keybind_helper.safe_lsp_call("hover"), opts("Show LSP hover info"))
+	-- keymap.set("n", "$", function() vim.lsp.buf.hover({ border = "rounded", max_height = 25, max_width = 120 }) end, opts("Hover documentation"))
+
 	keymap.set("n", "<leader>Ls", keybind_helper.safe_lsp_call("signature_help"), opts("Show function signature help"))
 
 	-- Workspace Folder Management
