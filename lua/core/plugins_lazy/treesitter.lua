@@ -1,3 +1,4 @@
+-- https://github.com/mks-h/treesitter-autoinstall.nvim for autoinstall. If there's a bug, check what he posted, he might have found a fix
 return {
 	{
 		"nvim-treesitter/nvim-treesitter",

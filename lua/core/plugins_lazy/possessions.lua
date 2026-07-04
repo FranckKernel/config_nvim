@@ -94,6 +94,7 @@ function M.config()
 			exclude_ft = { "NvimTree", "neo-tree", "TelescopePrompt" },
 		},
 		post_hook = function()
+			-- Runs when you open neovim
 			-- $HOME/.config/nvim/scripts/pythonScripts/open_remote_nvim.py
 			-- $HOME/.config/nvim/nvim-possession/lua/nvim-possession/regular_init.lua
 			-- $HOME/.config/nvim/lua/core/plugins_lazy/possessions.lua
@@ -154,7 +155,8 @@ end
 -- --------------------------
 
 return {
-	"PoutineSyropErable/nvim-possession", --- TODO, make my own
+	-- "PoutineSyropErable/nvim-possession", --- TODO, make my own
+	dir = "~/.config/nvim/nvim-possession",
 	branch = "main",
 	dependencies = {
 		"ibhagwan/fzf-lua",
