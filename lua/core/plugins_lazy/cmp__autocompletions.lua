@@ -58,13 +58,22 @@ return {
 			}),
 			formatting = {
 				format = function(entry, vim_item)
-					if entry.source.name == "nvim_lsp" then
-						local documentation = entry.completion_item.documentation
-						if documentation then
-							vim_item.documentation = documentation
-						end
-						vim_item.kind = string.format("%s %s", vim_item.kind, entry.completion_item.label)
+					local ci = entry.completion_item
+
+					-- 1. LSP function signature (THIS is what you were missing)
+					if ci.labelDetails and ci.labelDetails.detail then
+						vim_item.abbr = ci.label .. ci.labelDetails.detail
 					end
+
+					-- 2. keep documentation (your existing logic, fixed safely)
+					if ci.documentation then
+						vim_item.documentation = ci.documentation
+					end
+
+					-- 3. preserve kind (DON'T append label here)
+					vim_item.kind = vim_item.kind
+
+					-- 4. menu labels (unchanged)
 					vim_item.menu = ({
 						nvim_lsp = "[LSP]",
 						luasnip = "[Snip]",
@@ -72,6 +81,7 @@ return {
 						path = "[Path]",
 						bash = "[Bash]",
 					})[entry.source.name]
+
 					return vim_item
 				end,
 			},

@@ -173,42 +173,21 @@ return {
 			severity_sort = true,
 		})
 
-		vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
-			border = "rounded",
-			focusable = true,
-			max_width = 80,
-			max_height = 20,
-
-			-- floating window highlight groups
-			on_open = function(win, buf)
-				vim.api.nvim_set_option_value("winhighlight", "NormalFloat:NormalFloat,FloatBorder:FloatBorder", { win = win })
+		local lsp_helper = require("lsps.helper.lsp_config_helper")
+		--
+		vim.api.nvim_create_autocmd("LspAttach", {
+			callback = function(args)
+				local client = vim.lsp.get_client_by_id(args.data.client_id)
+				if not client then
+					ggu().print_custom("Warning: LSP client not found for LspAttach event")
+					return
+				end
+				if client.name == "clangd" then
+					ggu().print_custom("C LSP attached")
+					lsp_helper.add_keybinds(client, args.buf)
+				end
 			end,
 		})
-
-		vim.api.nvim_set_hl(0, "LspHoverNormal", {
-			bg = "NONE",
-		})
-
-		vim.api.nvim_set_hl(0, "LspHoverBorder", {
-			fg = "#89b4fa",
-			bg = "NONE",
-		})
-
-		-- local lsp_helper = require("lsps.helper.lsp_config_helper")
-		--
-		-- vim.api.nvim_create_autocmd("LspAttach", {
-		-- 	callback = function(args)
-		-- 		local client = vim.lsp.get_client_by_id(args.data.client_id)
-		-- 		if not client then
-		-- 			ggu().print_custom("Warning: LSP client not found for LspAttach event")
-		-- 			return
-		-- 		end
-		-- 		if client.name == "clangd" then
-		-- 			ggu().print_custom("C LSP attached")
-		-- 			lsp_helper.add_keybinds(client, args.buf)
-		-- 		end
-		-- 	end,
-		-- })
 
 		vim.api.nvim_create_user_command("LspInfo", ":checkhealth vim.lsp", { desc = "Alias to :checkhealth vim.lsp" })
 		vim.api.nvim_create_user_command("LspLog", function()
