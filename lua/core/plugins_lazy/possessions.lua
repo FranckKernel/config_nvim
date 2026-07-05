@@ -111,7 +111,8 @@ function M.config()
 
 			vim.cmd([[ScopeLoadState]])
 			load_tab_names()
-			vim.cmd([[AttachAllLSPs]])
+			lsp_helper = require("lsps.helper.lsp_config_helper")
+			lsp_helper.attach_lsp_to_all_buffers()
 			-- The attach all lsp call is needed for the one buffer i was active on
 
 			lsp_helper.add_keybinds()
@@ -137,9 +138,7 @@ function M.config()
 
 	local session_file = session_dir .. session_name .. ".vim"
 	ggu().print_custom("user_config: session file is " .. vim.inspect(session_file))
-	if vim.fn.filereadable(session_file) == 0 then
-		nvim_possession.create(session_name)
-	end
+	-- don't need auto session file creation
 
 	-- Keymaps
 	local keymap = vim.keymap

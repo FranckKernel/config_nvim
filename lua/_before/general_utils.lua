@@ -9,6 +9,7 @@ end
 M.PRINT_CUSTOM_DEBUG = true
 
 function M.print_custom(...)
+	-- print(...)
 	if not M.PRINT_CUSTOM_DEBUG then
 		return
 	end

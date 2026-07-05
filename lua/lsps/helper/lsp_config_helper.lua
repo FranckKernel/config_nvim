@@ -10,7 +10,9 @@ M.extension_to_filetype = {
 	bash = "bash",
 	rb = "ruby",
 	c = "c",
+	h = "c",
 	cpp = "cpp",
+	hpp = "cpp",
 	go = "go",
 	-- Add more extensions as needed
 }
@@ -50,6 +52,10 @@ function M.detect_filetype(bufnr)
 	if file then
 		local first_line = file:read("*line") -- Read the first line
 		file:close()
+
+		if first_line == nil then
+			return "text"
+		end
 
 		-- Check for common shebang patterns
 		if first_line:match("^#!.*bash") then
@@ -187,6 +193,14 @@ end
 M.attach_lsp_to_all_buffers = function()
 	gu().print_custom("Attaching all LSPs")
 	for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+		-- skip invalid / unloaded buffers early
+
+		-- gu().print_custom("The buffer: " .. vim.inspect(bufnr))
+
+		if not vim.api.nvim_buf_is_valid(bufnr) then
+			goto continue
+		end
+
 		local filetype = vim.bo[bufnr].filetype
 
 		-- If the filetype is empty, trigger filetype detection
@@ -204,6 +218,8 @@ M.attach_lsp_to_all_buffers = function()
 			gu().print_custom("The filetype detect worked")
 		end
 
+		gu().print_custom("The filetype is: " .. vim.inspect(filetype))
+
 		-- Check if there's a corresponding LSP for this filetype
 		local lsp_name = M.lsp_name_of_filetype[filetype]
 		if lsp_name then
@@ -214,6 +230,8 @@ M.attach_lsp_to_all_buffers = function()
 				"No LSP for filetype " .. vim.inspect(filetype) .. " at bufnr: " .. vim.inspect(bufnr) .. " with filename: " .. vim.inspect(filename)
 			)
 		end
+
+		::continue::
 	end
 end
 
