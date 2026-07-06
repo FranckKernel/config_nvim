@@ -15,7 +15,7 @@ M.config = {
 			"-std=c23",
 		},
 	},
-	filetypes = { "c", "cpp", "objc", "objcpp" },
+	filetypes = { "c", "cpp", "objc", "objcpp", ".ino" },
 	root_dir = require("lspconfig.util").root_pattern("compile_commands.json", ".clang-format", ".clangd", "compile_flags.txt", "Makefile", ".git"),
 	on_attach = function(client, bufnr)
 		local lsp_helper = require("lsps.helper.lsp_config_helper")

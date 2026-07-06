@@ -13,6 +13,8 @@ M.use_system_clipboard = false
 M.word_ws = true
 
 M.verbose_log = false
+
+M.clangdNotCCLS = false
 -- etc.
 
 -- Function to print the current config state

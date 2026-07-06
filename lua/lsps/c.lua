@@ -32,7 +32,7 @@ M.config = {
 			-- Keep OpenCL flags only for actual OpenCL files
 		},
 	},
-	filetypes = { "c", "h", "cpp", "objc", "objcpp", "cppm", "ixx" }, -- cppm and ixx are for cpp modules
+	filetypes = { "c", "h", "cpp", "objc", "objcpp", "cppm", "ixx", "ino", "arduino" }, -- cppm and ixx are for cpp modules
 	root_dir = require("lspconfig.util").root_pattern(
 		-- "compile_commands.json",
 		".clang-format",

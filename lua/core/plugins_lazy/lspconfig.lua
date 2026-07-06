@@ -42,6 +42,7 @@ return {
 
 		local asm_lsp = require("lsps.asm")
 		local c_lsp = require("lsps.c")
+		local ccls = require("lsps.ccls")
 		local opencl_lsp = require("lsps.opencl")
 		local zig_lsp = require("lsps.zig")
 		local rust_lsp = require("lsps.rust")
@@ -117,13 +118,18 @@ return {
 				vim.lsp.config("bashls", extend_capabilities(bash_lsp.config))
 
 				vim.lsp.config("asm_lsp", extend_capabilities(asm_lsp.config))
+
+				-- Pick one or the other
 				vim.lsp.config("clangd", extend_capabilities(c_lsp.config))
+				vim.lsp.config("ccls", extend_capabilities(ccls.config))
+
 				vim.lsp.config("opencl_ls", extend_capabilities(opencl_lsp.config))
 				vim.lsp.config("rust_analyzer", extend_capabilities(rust_lsp.config))
 
 				vim.lsp.config("texlab", extend_capabilities(latex_lsp.config))
 
 				vim.lsp.enable({ "bashls", "asm_lsp", "clangd", "opencl_ls", "rust_analyzer", "texlab" })
+				vim.lsp.enable("ccls")
 			end
 		end
 
@@ -139,7 +145,13 @@ return {
 			lspconfig.bashls.setup(bash_lsp.config)
 
 			lspconfig.asm_lsp.setup(asm_lsp.config)
-			lspconfig.clangd.setup(c_lsp.config)
+
+			if pre_config.clangdNotCCLS then
+				lspconfig.clangd.setup(c_lsp.config)
+			else
+				lspconfig.ccls.setup(ccls.config)
+			end
+
 			lspconfig.opencl_ls.setup(opencl_lsp.config)
 			lspconfig.zls.setup(zig_lsp.config) -- already configured by native
 			lspconfig.rust_analyzer.setup(rust_lsp.config)

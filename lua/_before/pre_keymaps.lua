@@ -216,6 +216,10 @@ function RunCurrentFile()
 			local execute_command = current_dir .. "/" .. executable
 			return build_cmd .. " && " .. execute_command
 		end,
+		ino = function()
+			-- calls espflash "cureent file"
+			return "zsh -ic " .. vim.fn.shellescape("espflash " .. filepath)
+		end,
 	}
 
 	-- Early exit if extension not supported

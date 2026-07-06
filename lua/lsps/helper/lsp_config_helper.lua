@@ -10,6 +10,7 @@ M.extension_to_filetype = {
 	bash = "bash",
 	rb = "ruby",
 	c = "c",
+	ino = "c",
 	h = "c",
 	cpp = "cpp",
 	hpp = "cpp",
