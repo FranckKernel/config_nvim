@@ -142,8 +142,8 @@ keymap.set("v", "o", "o", opts("Change cursor selection in visual mode. Top/Bott
 -- keymap.set("n", "<leader>yy", '"+yy', { noremap = true, silent = true })
 keymap.set("n", "<leader>C", '"+yy', { noremap = true, silent = true })
 keymap.set("v", "<leader>C", '"+yy', { noremap = true, silent = true })
-keymap.set("n", "<leader>P", '"+p', { noremap = true, silent = true })
-keymap.set("v", "<leader>P", '"+p', { noremap = true, silent = true })
+keymap.set("n", "<leader>v", '"+p', { noremap = true, silent = true })
+keymap.set("v", "<leader>V", '"+p', { noremap = true, silent = true })
 
 keymap.set("n", "<C-c>", '"+y', { noremap = true, silent = true })
 keymap.set("n", "<C-x>", '"+d', { noremap = true, silent = true })
@@ -219,6 +219,10 @@ function RunCurrentFile()
 		ino = function()
 			-- calls espflash "cureent file"
 			return "zsh -ic " .. vim.fn.shellescape("espflash " .. filepath)
+		end,
+		lua = function()
+			--
+			return "lua " .. vim.fn.shellescape(filepath)
 		end,
 	}
 

@@ -1,6 +1,7 @@
 local M = {}
 local function opts(desc) return { noremap = true, silent = true, desc = desc } end
 local gu = function() return require("_before.general_utils") end
+local pre_config = require("_before.pre_config")
 
 M.extension_to_filetype = {
 	lua = "lua",
@@ -76,16 +77,24 @@ function M.detect_filetype(bufnr)
 	return "text"
 end
 
+local lsp_of_c
+
+if pre_config.clangdNotCCLS then
+	lsp_of_c = "clangd"
+else
+	lsp_of_c = "ccls"
+end
+
 M.lsp_name_of_filetype = {
 	bash = "bashls",
 	sh = "bashls",
 	zsh = "bashls",
 	lua = "lua_ls",
 	python = "pyright",
-	c = "clangd",
-	cpp = "clangd",
-	objc = "clangd",
-	objcpp = "clangd",
+	c = lsp_of_c,
+	cpp = lsp_of_c,
+	objc = lsp_of_c,
+	objcpp = lsp_of_c,
 	rust = "rust_analyzer",
 	java = "jdtls",
 	tex = "texlab",
@@ -96,6 +105,16 @@ M.lsp_name_of_filetype = {
 	S = "asm_lsp",
 }
 
+local c_lsp_func = function()
+	local clangd = pre_config.clangdNotCCLS
+
+	if clangd then
+		return require("lsp.c")
+	else
+		return require("lsp.ccls")
+	end
+end
+
 -- Lazy mapping: filetype -> function that returns the LSP config
 M.config_of_filetype = {
 	lua = function() return require("lsps.lua") end,
@@ -104,10 +123,10 @@ M.config_of_filetype = {
 	sh = function() return require("lsps.bash") end,
 	zsh = function() return require("lsps.bash") end,
 	opencl = function() return require("lsps.opencl") end,
-	c = function() return require("lsps.c") end,
-	cpp = function() return require("lsps.c") end,
-	objc = function() return require("lsps.c") end,
-	objcpp = function() return require("lsps.c") end,
+	c = c_lsp_func,
+	cpp = c_lsp_func,
+	objc = c_lsp_func,
+	objcpp = c_lsp_func,
 	rust = function() return require("lsps.rust") end,
 	java = function() return require("lsps.java") end,
 	tex = function() return require("lsps.latex") end,
@@ -192,6 +211,7 @@ end
 
 --- Function to check active buffers and attach corresponding LSPs
 M.attach_lsp_to_all_buffers = function()
+	-- AttachAllLSPs function implementation
 	gu().print_custom("Attaching all LSPs")
 	for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
 		-- skip invalid / unloaded buffers early
@@ -322,7 +342,7 @@ function lsp_hover()
 	end)
 end
 
-M.add_keybinds = function(client, bufnr)
+M.add_keybinds = function()
 	local keymap = vim.keymap
 	local hl = "core.plugins_lazy.helper.lsp_keybind"
 	local tb = "telescope.builtin"

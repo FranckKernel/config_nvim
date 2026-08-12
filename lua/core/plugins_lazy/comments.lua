@@ -21,7 +21,9 @@ function ToggleAsmComment()
 end
 
 return {
-	"numToStr/Comment.nvim",
+	-- "numToStr/Comment.nvim",
+	"neovim-plugins/comment.nvim",
+	branch = "fix/patch-treesitter",
 	lazy = true,
 	keys = {
 		{ "gcc", mode = "n", desc = "Toggle comment line" },
@@ -41,6 +43,8 @@ return {
 		local ft = require("Comment.ft")
 		-- For NASM/GAS style assembly, line comment is `;`
 		ft.set("asm", ";%s")
+
+		ft.set("systemd", "# %s")
 
 		vim.keymap.set("n", "<leader>.a", ToggleAsmComment, { desc = "Toggle Asm comment from ; to #" })
 	end,

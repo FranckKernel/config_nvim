@@ -187,6 +187,8 @@ return {
 						"%old_vim/.*",
 						"%nvim_config/.*",
 						"%vim_config/.*",
+						"%.ccls%-cache/.*",
+						"%.cache/.*",
 					},
 				},
 				pickers = {

@@ -14,7 +14,7 @@ M.word_ws = true
 
 M.verbose_log = false
 
-M.clangdNotCCLS = false
+M.clangdNotCCLS = true
 -- etc.
 
 -- Function to print the current config state

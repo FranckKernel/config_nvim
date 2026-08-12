@@ -4,7 +4,6 @@ require("lazy").setup({
 	{ import = "core.plugins_lazy" },
 
 	-- Add individual plugins or configs inline
-	"folke/which-key.nvim",
 	{
 		"echasnovski/mini.bufremove",
 		lazy = true,

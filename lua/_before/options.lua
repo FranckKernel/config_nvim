@@ -16,6 +16,7 @@ vim.opt.shiftround = true
 vim.opt.expandtab = false
 vim.o.autoindent = true -- Maintain indentation from the previous line
 vim.o.smartindent = true -- More intelligent auto-indentation
+vim.opt.modeline = false
 
 vim.o.winborder = "rounded"
 
