@@ -122,7 +122,7 @@ return {
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			"nvim-tree/nvim-web-devicons",
-			"nvim-telescope/telescope-fzf-native.nvim", -- fzf extension
+			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" }, -- fzf extension
 			"nvim-telescope/telescope-ui-select.nvim",
 			"nvim-telescope/telescope-file-browser.nvim",
 			"AckslD/nvim-neoclip.lua",
@@ -244,9 +244,13 @@ return {
 				},
 			})
 
+			-- local telescope_fzf_native = require("telescope-fzf-native")
+
 			-- Load extensions
 			telescope.load_extension("neoclip")
 			telescope.load_extension("fzf")
+			-- cd $HOME/.local/share/nvim/lazy/telescope-fzf-native.nvim
+			-- make
 			telescope.load_extension("ui-select")
 			telescope.load_extension("file_browser")
 			telescope.load_extension("scope")
