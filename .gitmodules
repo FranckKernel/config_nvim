@@ -10,3 +10,7 @@
 	path = nvim-possession
 	url = https://github.com/PoutineSyropErable/nvim-possession
 
+[submodule "nvim-platformio.lua"]
+	path = nvim-platformio.lua
+	url = https://github.com/anurag3301/nvim-platformio.lua
+

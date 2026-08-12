@@ -10,7 +10,7 @@ return {
 	lazy = true,
 	event = { "BufReadPre", "BufNewFile" },
 	dependencies = {
-		{ "williamboman/mason.nvim", build = ":MasonUpdate" },
+		{ "williamboman/mason.nvim" },
 		"williamboman/mason-lspconfig.nvim",
 		"WhoIsSethDaniel/mason-tool-installer.nvim",
 		"hrsh7th/nvim-cmp",
