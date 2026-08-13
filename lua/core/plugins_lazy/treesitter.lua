@@ -2,8 +2,9 @@
 return {
 	{
 		"nvim-treesitter/nvim-treesitter",
-		build = ":TSUpdate",
-		-- branch = "master",
+		-- build = ":TSUpdate",
+		-- branch = "master", -- nvim 0.11 implementation
+		branch = "main",
 		version = false,
 		event = { "BufReadPost", "BufNewFile" },
 		config = function()
