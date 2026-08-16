@@ -66,7 +66,7 @@ git submodule update --remote --recursive
 # Install system packages from the official Arch repositories
 sudo pacman -S --needed clang rust-analyzer ruby npm nodejs prettier \
 python-pip python-virtualenv flake8 lua-language-server bash-language-server go \
-clang-tools-extra python-debugpy python-isort python-pylint
+clang-tools-extra python-debugpy python-isort python-pylint tree-sitter-cli
 
 # Install JDTLS from AUR
 yay -S --needed jdtls
