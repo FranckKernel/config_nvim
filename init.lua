@@ -11,6 +11,7 @@ if FIND_PRINT then
 	end
 end
 
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 -- ~/.local/share/nvim .. / lazy/lazy.nvim
 -- ~/.local/share/nvim/lazy/lazy.nvim
