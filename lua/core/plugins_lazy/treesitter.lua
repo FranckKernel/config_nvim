@@ -25,6 +25,17 @@ return {
 
 			local function has_parser(lang) return vim.list_contains(nvim_treesitter.get_available(), lang) end
 
+			local function check_treesitter_cli()
+				if vim.fn.executable("tree-sitter") == 0 then
+					vim.notify("tree-sitter CLI is not installed. Install it with: sudo pacman -S tree-sitter", vim.log.levels.ERROR)
+					return false
+				end
+
+				return true
+			end
+
+			check_treesitter_cli()
+
 			vim.api.nvim_create_autocmd("FileType", {
 				callback = function(args)
 					local ft = vim.bo[args.buf].filetype
