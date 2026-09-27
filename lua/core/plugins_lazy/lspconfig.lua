@@ -73,6 +73,9 @@ return {
 					"solargraph",
 					"ts_ls",
 					"svls",
+
+					-- "rust_hdl",
+					"vhdl_ls",
 				},
 				automatic_installation = true, -- or true if you want automatic installs
 				-- automatic_enable = { "pyright", "lua_ls", exclude = {} },
