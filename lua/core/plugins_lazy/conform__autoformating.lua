@@ -13,7 +13,7 @@ return {
 					style_arg = "-style=file"
 				else
 					-- fallback style
-					style_arg = "-style={UseTab: ForIndentation, IndentWidth: 4}"
+					style_arg = "-style={UseTab: ForIndentation, IndentWidth: 4, TabWidth: 4}"
 				end
 
 				return {
