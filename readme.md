@@ -120,6 +120,11 @@ pip3 install debugpy isort mypy pylint ruff black
 Note: I don't have a mac, so it might not work perfectly, in which case we'll need to go and find out which package manager gives them
 
 ```bash
+# Most important one. Just do that one, the other are Optional or not even needed anymore. 
+# If you have erorrs due to them missing, then install them. 
+brew install tree-sitter
+
+
 # Install system packages, Core LSP and dependencies
 brew install clang-format rust-analyzer ruby npm node prettier \
 python@3.11 lua-language-server \
