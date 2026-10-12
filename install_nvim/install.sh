@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+sudo apt install -y clangd
+sudo npm install -g bash-language-server
+
 BASE="https://github.com/neovim/neovim/releases/latest/download"
 DEST="$HOME/.local/bin/nvimd"
 LINK="$HOME/.local/bin/nvim"

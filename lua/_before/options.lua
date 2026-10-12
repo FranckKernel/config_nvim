@@ -118,6 +118,13 @@ vim.filetype.add({
 
 		ixx = "cpp", -- Simpler way to map .ixx to cpp
 	},
+	filename = {
+		["config"] = function(path)
+			if path:match("/%.config/polybar/config$") then
+				return "ini"
+			end
+		end,
+	},
 })
 
 -- vim.cmd('set verbose=10')
