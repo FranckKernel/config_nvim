@@ -2,7 +2,17 @@
 set -euo pipefail
 
 BASE="https://github.com/neovim/neovim/releases/latest/download"
-DEST="$HOME/.local/bin/nvim"
+DEST="$HOME/.local/bin/nvimd"
+LINK="$HOME/.local/bin/nvim"
+
+# Already installed? Make sure the link exists, then stop.
+if [[ -x "$DEST/bin/nvim" ]]; then
+	echo "Neovim already installed in $DEST, skipping download."
+	mkdir -p "$(dirname "$LINK")"
+	ln -sf "$DEST/bin/nvim" "$LINK"
+	"$DEST/bin/nvim" --version | head -1
+	exit 0
+fi
 
 case "$(uname -m)" in
 aarch64 | arm64) asset="nvim-linux-arm64.tar.gz" ;;
@@ -22,20 +32,11 @@ echo "Downloading latest $asset..."
 curl -fsSL "$BASE/$asset" -o "$tmp/nvim.tar.gz"
 
 rm -rf "$DEST"
-mkdir -p "$DEST"
+mkdir -p "$DEST" "$(dirname "$LINK")"
 tar -xzf "$tmp/nvim.tar.gz" -C "$DEST" --strip-components=1
 
-# The binary is at $DEST/bin/nvim, so that folder must be on PATH
-BIN="$DEST/bin"
-LINE="export PATH=\"$BIN:\$PATH\""
-for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
-	if [[ -f "$rc" ]] && ! grep -qF "$BIN" "$rc"; then
-		echo "$LINE" >>"$rc"
-	fi
-done
-if command -v fish >/dev/null; then
-	fish -c "fish_add_path $BIN"
-fi
+# Symlink into ~/.local/bin (no rc file edits)
+ln -sf "$DEST/bin/nvim" "$LINK"
 
-"$BIN/nvim" --version | head -1
-echo "Open a new shell (or run: hash -r) so 'nvim' resolves to this version."
+"$DEST/bin/nvim" --version | head -1
+echo "Linked $LINK -> $DEST/bin/nvim"
