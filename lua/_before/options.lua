@@ -18,7 +18,9 @@ vim.o.autoindent = true -- Maintain indentation from the previous line
 vim.o.smartindent = true -- More intelligent auto-indentation
 vim.opt.modeline = false
 
-vim.o.winborder = "rounded"
+if vim.fn.exists("+winborder") == 1 then
+	vim.o.winborder = "rounded" -- whatever value you use
+end
 
 vim.opt.mousemoveevent = true -- activate mouse
 vim.opt.mouse = "nvc" -- Enable mouse in Normal, Visual, and Command mode
