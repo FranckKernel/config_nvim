@@ -85,7 +85,7 @@ return {
 				desc = "Live grep current big word (Till spaces)",
 			},
 			{
-				"ga",
+				"gA",
 				function() require(hp).grep_current_big_word_in_project() end,
 				desc = "Live grep current big word in project (Till spaces)",
 			},
