@@ -103,6 +103,7 @@ M.lsp_name_of_filetype = {
 	asm = "asm_lsp",
 	s = "asm_lsp",
 	S = "asm_lsp",
+	vhdl = "vhdl_lsp",
 }
 
 local c_lsp_func = function()
@@ -135,6 +136,7 @@ M.config_of_filetype = {
 	asm = function() return require("lsps.asm") end,
 	s = function() return require("lsps.asm") end,
 	S = function() return require("lsps.asm") end,
+	vhdl = function() return require("lsps.vhdl") end,
 }
 
 -- Lazy loader: LSP server name -> function returning its config
@@ -148,6 +150,7 @@ M.config_of_lspname = {
 	texlab = function() return require("lsps.latex") end,
 	asm_lsp = function() return require("lsps.asm") end,
 	opencl = function() return require("lsps.opencl") end,
+	vhdl_ls = function() return require("lsps.vhdl") end,
 }
 
 --- @param name string The name of the LSP server (e.g., "pyright", "clangd").
