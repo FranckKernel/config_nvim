@@ -24,7 +24,6 @@ M.config = {
 
 	on_init = function(client, bufnr)
 		print("Zig lsp initiated")
-
 		local lsp_helper = require("lsps.helper.lsp_config_helper")
 		lsp_helper.add_keybinds()
 	end,
