@@ -64,7 +64,7 @@ return {
 					"pyright",
 
 					"clangd",
-					"zls",
+					-- "zls",
 					"rust_analyzer",
 
 					"gopls",
@@ -77,7 +77,7 @@ return {
 					-- "rust_hdl",
 					-- "vhdl_ls",
 				},
-				automatic_installation = true, -- or true if you want automatic installs
+				automatic_installation = false, -- or true if you want automatic installs
 				-- automatic_enable = { "pyright", "lua_ls", exclude = {} },
 				-- automatic_enable = { "clangd" },
 				automatic_enable = false,

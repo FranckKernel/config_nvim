@@ -224,6 +224,15 @@ function RunCurrentFile()
 			--
 			return "lua " .. vim.fn.shellescape(filepath)
 		end,
+		asm = function()
+			local obj = basename .. ".o"
+			local cmds = {
+				string.format("nasm -f elf64 -g -F dwarf %s -o %s", vim.fn.shellescape(filepath), vim.fn.shellescape(obj)),
+				string.format("ld %s -o %s", vim.fn.shellescape(obj), vim.fn.shellescape(basename)),
+				vim.fn.shellescape("./" .. basename),
+			}
+			return table.concat(cmds, " && ")
+		end,
 	}
 
 	-- Early exit if extension not supported

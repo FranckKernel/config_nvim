@@ -22,11 +22,16 @@ M.config = {
 		},
 	},
 
+	on_init = function(client, bufnr)
+		print("Zig lsp initiated")
+
+		local lsp_helper = require("lsps.helper.lsp_config_helper")
+		lsp_helper.add_keybinds()
+	end,
+
 	on_attach = function(client, bufnr)
 		-- your on_attach logic
-		local lsp_helper = require("lsps.helper.lsp_config_helper")
 		ggu().print_custom("Zig LSP Attached")
-		lsp_helper.add_keybinds()
 	end,
 }
 
