@@ -36,6 +36,8 @@ keymap.set("n", "k", "j", opts("Move down (j mapped to k)"))
 keymap.set("n", "h", "i", opts("Enter insert mode"))
 
 keymap.set("n", "J", "_", opts("Move to beginning of line"))
+keymap.set("n", "<leader>J", "J", opts("Join lines"))
+keymap.set("n", "<leader>gJ", "gJ", opts("Join lines"))
 keymap.set("n", "L", "$", opts("Move to end of line"))
 keymap.set("n", "I", "H", opts("Move to the top of the view port"))
 keymap.set("n", "K", "L", opts("Move to the bottom of the view port"))

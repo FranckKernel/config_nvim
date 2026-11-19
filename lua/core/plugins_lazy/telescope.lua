@@ -44,6 +44,15 @@ return {
 				desc = "Live grep in Project",
 			},
 			{
+				"<leader>fO",
+				function()
+					require("telescope.builtin").live_grep({
+						grep_open_files = true,
+					})
+				end,
+				{ desc = "Search open buffers" },
+			},
+			{
 				"<leader>g1",
 				function() require(hp).live_grep_back(1) end,
 				desc = "Live grep",
