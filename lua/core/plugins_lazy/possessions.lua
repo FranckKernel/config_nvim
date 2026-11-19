@@ -155,7 +155,7 @@ end
 
 return {
 	-- "PoutineSyropErable/nvim-possession", --- TODO, make my own
-	dir = "~/.config/nvim/nvim-possession",
+	dir = vim.fn.stdpath("config") .. "/nvim-possession",
 	branch = "main",
 	dependencies = {
 		"nvim-telescope/telescope.nvim",

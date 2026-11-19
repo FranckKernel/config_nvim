@@ -64,7 +64,7 @@ require("lazy").setup({
 		cmd = { "AnsiEsc" },
 	},
 	{
-		dir = "~/.config/nvim/tabout_tree",
+		dir = vim.fn.stdpath("config") .. "/tabout_tree",
 		-- "PoutineSyropErable/tabout-tree.nvim",
 		dependencies = { "nvim-treesitter/nvim-treesitter" },
 		config = function() require("treesitter_inspect").setup() end,
