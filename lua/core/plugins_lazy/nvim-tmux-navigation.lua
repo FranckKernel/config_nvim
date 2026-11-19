@@ -27,6 +27,8 @@ if is_windows then
 	keymap("", "<C-w><Down>", ":wincmd j<CR>", opts)
 	keymap("", "<C-w><Up>", ":wincmd k<CR>", opts)
 	keymap("", "<C-w><Right>", ":wincmd l<CR>", opts)
+
+	return {}
 else
 	-- Linux: use lazy-loaded plugin with keys to lazy load it
 	return {

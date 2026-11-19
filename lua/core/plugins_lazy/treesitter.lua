@@ -41,6 +41,8 @@ return {
 					local ft = vim.bo[args.buf].filetype
 					local lang = vim.treesitter.language.get_lang(ft)
 
+					-- print("This is the problematic autocommand\n\n\n")
+
 					if not lang then
 						return
 					end

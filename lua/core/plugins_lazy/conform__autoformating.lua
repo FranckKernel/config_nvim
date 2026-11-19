@@ -25,7 +25,7 @@ return {
 			local uncrustify_args = {
 				command = "uncrustify",
 				stdin = false,
-				args = { "-c", os.getenv("HOME") .. "/uncrustify.cfg", "--replace", "--no-backup", "$FILENAME" },
+				args = { "-c", vim.fn.expand("~/.uncrustify.cfg"), "--replace", "--no-backup", "$FILENAME" },
 			}
 
 			conform.setup({

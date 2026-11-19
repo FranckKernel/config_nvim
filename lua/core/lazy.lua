@@ -55,7 +55,6 @@ require("lazy").setup({
 		ft = "yuck", -- load only for yuck filetype
 	},
 
-	"preservim/vimux", -- to configure
 	"szw/vim-maximizer", -- good full screen toggle
 	{
 		-- This does what i wanted baleia to do. Baleia is destructive
