@@ -18,24 +18,6 @@ return {
 		local luasnip = require("luasnip")
 		require("luasnip.loaders.from_vscode").lazy_load()
 
-		-- Custom bash completion source
-		cmp.register_source("bash", {
-			complete = function(_, _, callback)
-				local handle = io.popen('bash -c "compgen -c"')
-				if handle then
-					local result = handle:read("*a")
-					handle:close()
-					local items = {}
-					for cmd in string.gmatch(result, "[^\n]+") do
-						table.insert(items, { label = cmd })
-					end
-					callback({ items = items, isIncomplete = false })
-				else
-					callback({ items = {}, isIncomplete = true })
-				end
-			end,
-		})
-
 		cmp.setup({
 			snippet = {
 				expand = function(args) luasnip.lsp_expand(args.body) end,
