@@ -90,6 +90,16 @@ return {
 			})
 		end
 
+		local bash_completion = require("core.plugins_lazy.helper.autocompletion_bash")
+
+		-- Register Bash completion source.
+		cmp.register_source("bash", bash_completion.source)
+
+		-- Refresh Bash completion cache.
+		vim.keymap.set("n", "<leader>cb", bash_completion.refresh, {
+			desc = "Refresh Bash command completion cache",
+		})
+
 		setup_cmdline("/", { { name = "buffer" } })
 		cmp.setup.cmdline(":", {
 			mapping = cmp.mapping.preset.cmdline(),
