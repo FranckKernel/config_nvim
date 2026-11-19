@@ -10,3 +10,5 @@ others/**
 **/*.pyc
 **/__pycache__/
 *.egg-info/
+
+./nvim-platformio.lua

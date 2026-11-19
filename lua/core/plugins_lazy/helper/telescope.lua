@@ -8,6 +8,31 @@ function M.find_files()
 	builtin.find_files({ cwd = vim.fn.getcwd() })
 end
 
+function M.find_files_back(back)
+	local builtin = require("telescope.builtin")
+
+	local current_dir = vim.fn.getcwd()
+
+	-- Calculate the parent directory 'back' times
+	local target_dir = current_dir
+	for _ = 1, (back or 1) do
+		target_dir = vim.fn.fnamemodify(target_dir, ":h")
+		-- Stop at root
+		if target_dir == vim.fn.fnamemodify(target_dir, ":h") then
+			break
+		end
+	end
+
+	-- Show what we're doing
+	ggu().print_custom(string.format("Searching in: %s (from: %s)", target_dir, current_dir))
+
+	-- Run find_files from the parent directory
+	builtin.find_files({
+		cwd = target_dir,
+		follow = true, -- Maybe cd into that dir too?
+	})
+end
+
 function M.find_files_in_project()
 	local builtin = require("telescope.builtin")
 	builtin.find_files({ cwd = get_root() })
@@ -16,6 +41,30 @@ end
 function M.live_grep()
 	local builtin = require("telescope.builtin")
 	builtin.live_grep({ cwd = vim.fn.getcwd() })
+end
+
+function M.live_grep_back(back)
+	local builtin = require("telescope.builtin")
+	local current_dir = vim.fn.getcwd()
+
+	-- Calculate the parent directory 'back' times
+	local target_dir = current_dir
+	for _ = 1, (back or 1) do
+		target_dir = vim.fn.fnamemodify(target_dir, ":h")
+		-- Stop at root
+		if target_dir == vim.fn.fnamemodify(target_dir, ":h") then
+			break
+		end
+	end
+
+	-- Show what we're doing
+	ggu().print_custom(string.format("Searching in: %s (from: %s)", target_dir, current_dir))
+
+	-- Run find_files from the parent directory
+	builtin.live_grep({
+		cwd = target_dir,
+		follow = true, -- Maybe cd into that dir too?
+	})
 end
 
 function M.live_grep_in_project()

@@ -4,7 +4,8 @@ M = {}
 
 M.config = {
 	cmd = {
-		"clangd",
+		"/usr/bin/clangd",
+		-- "/usr/local/bin/clangd",
 		"--background-index",
 		"--clang-tidy",
 		"--completion-style=detailed",
@@ -14,6 +15,7 @@ M.config = {
 		"--log=verbose",
 		"--query-driver=/opt/rocm/llvm/bin/*",
 		"--fallback-style=llvm",
+		-- "--experimental-modules-support",
 	},
 	init_options = {
 		clangdFileStatus = true,
@@ -30,9 +32,15 @@ M.config = {
 			-- Keep OpenCL flags only for actual OpenCL files
 		},
 	},
-	filetypes = { "c", "h", "cpp", "objc", "objcpp" }, -- Removed "x" and "opencl"
+
+	settings = {
+		clangd = {
+			fallbackFlags = { "-std=c23" }, -- Changed from C++ to C standard
+		},
+	},
+	filetypes = { "c", "h", "cpp", "objc", "objcpp", "cppm", "ixx", "ino", "arduino" }, -- cppm and ixx are for cpp modules
 	root_dir = require("lspconfig.util").root_pattern(
-		"compile_commands.json",
+		-- "compile_commands.json",
 		".clang-format",
 		".clangd",
 		"compile_flags.txt",
@@ -40,15 +48,16 @@ M.config = {
 		"build.sh",
 		".git"
 	),
-	settings = {
-		clangd = {
-			fallbackFlags = { "-std=c23" }, -- Changed from C++ to C standard
-		},
-	},
-	on_attach = function(client, bufnr)
+
+	on_init = function(client, bufnr)
+		--
+		print("Lsp clangd initiated")
 		local lsp_helper = require("lsps.helper.lsp_config_helper")
-		print("c lsp attached")
 		lsp_helper.add_keybinds()
+	end,
+	on_attach = function(client, bufnr)
+		---
+		print("C/C++ (clangd) LSP attached")
 	end,
 }
 

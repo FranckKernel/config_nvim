@@ -13,7 +13,7 @@ return {
 					style_arg = "-style=file"
 				else
 					-- fallback style
-					style_arg = "-style={UseTab: ForIndentation, IndentWidth: 4}"
+					style_arg = "-style={UseTab: ForIndentation, IndentWidth: 4, TabWidth: 4}"
 				end
 
 				return {
@@ -47,13 +47,27 @@ return {
 					uncrustify = uncrustify_args,
 					clang_format = tab_formatter_c("clang-format"),
 					-- add more formatters here
+
+					vsg = {
+						command = "vsg",
+						args = {
+							"-c",
+							vim.fn.expand("~/.config/vsg/config.yaml"),
+							"--fix",
+							"$FILENAME",
+						},
+					},
 				},
+
 				formatters_by_ft = {
 					lua = { "stylua" },
 					python = { "black" },
 					c = { "clang_format" },
 					cpp = { "clang_format" },
 					javascript = { "prettier", stop_after_first = true },
+					json = { "jq" }, -- or "prettier" if you have Node/Prettier installed
+					vhdl = { "vsg" },
+
 					-- add more filetypes here
 				},
 				format_on_save = {

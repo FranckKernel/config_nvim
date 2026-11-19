@@ -23,9 +23,13 @@ mkdir -p ~/.config/nvim_logs
 
 # Backup existing ~/.config/nvim if it exists, using numbered backups (~1, ~2, etc.)
 [ -d ~/.config/nvim ] && mv --backup=numbered ~/.config/nvim ~/.config/nvim_backup
+# need coreutils, gmv on mac
+
+mkdir -p ~/.config/nvim
 
 # Clone the Neovim configuration repository and the submodules
 git clone --branch fully_lazy https://github.com/PoutineSyropErable/config_nvim ~/.config/nvim --recurse-submodules
+
 
 #or, two parter:
 git clone https://github.com/PoutineSyropErable/config_nvim ~/.config/nvim
@@ -36,6 +40,8 @@ git submodule update --init --recursive
 # and other update: 
 git pull --recurse-submodules
 git submodule update --recursive --remote
+
+cargo install tree-sitter-cli 
 
 
 
@@ -67,7 +73,7 @@ git submodule update --remote --recursive
 # Install system packages from the official Arch repositories
 sudo pacman -S --needed clang rust-analyzer ruby npm nodejs prettier \
 python-pip python-virtualenv flake8 lua-language-server bash-language-server go \
-clang-tools-extra python-debugpy python-isort python-pylint
+clang-tools-extra python-debugpy python-isort python-pylint tree-sitter-cli
 
 # Install JDTLS from AUR
 yay -S --needed jdtls
@@ -117,6 +123,11 @@ pip3 install debugpy isort mypy pylint ruff black
 Note: I don't have a mac, so it might not work perfectly, in which case we'll need to go and find out which package manager gives them
 
 ```bash
+# Most important one. Just do that one, the other are Optional or not even needed anymore. 
+# If you have erorrs due to them missing, then install them. 
+brew install tree-sitter
+
+
 # Install system packages, Core LSP and dependencies
 brew install clang-format rust-analyzer ruby npm node prettier \
 python@3.11 lua-language-server \

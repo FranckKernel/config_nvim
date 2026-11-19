@@ -1,6 +1,7 @@
 local M = {}
 local function opts(desc) return { noremap = true, silent = true, desc = desc } end
 local gu = function() return require("_before.general_utils") end
+local pre_config = require("_before.pre_config")
 
 M.extension_to_filetype = {
 	lua = "lua",
@@ -10,7 +11,10 @@ M.extension_to_filetype = {
 	bash = "bash",
 	rb = "ruby",
 	c = "c",
+	ino = "c",
+	h = "c",
 	cpp = "cpp",
+	hpp = "cpp",
 	go = "go",
 	-- Add more extensions as needed
 }
@@ -51,6 +55,10 @@ function M.detect_filetype(bufnr)
 		local first_line = file:read("*line") -- Read the first line
 		file:close()
 
+		if first_line == nil then
+			return "text"
+		end
+
 		-- Check for common shebang patterns
 		if first_line:match("^#!.*bash") then
 			return "bash"
@@ -69,16 +77,24 @@ function M.detect_filetype(bufnr)
 	return "text"
 end
 
+local lsp_of_c
+
+if pre_config.clangdNotCCLS then
+	lsp_of_c = "clangd"
+else
+	lsp_of_c = "ccls"
+end
+
 M.lsp_name_of_filetype = {
 	bash = "bashls",
 	sh = "bashls",
 	zsh = "bashls",
 	lua = "lua_ls",
 	python = "pyright",
-	c = "clangd",
-	cpp = "clangd",
-	objc = "clangd",
-	objcpp = "clangd",
+	c = lsp_of_c,
+	cpp = lsp_of_c,
+	objc = lsp_of_c,
+	objcpp = lsp_of_c,
 	rust = "rust_analyzer",
 	java = "jdtls",
 	tex = "texlab",
@@ -87,7 +103,18 @@ M.lsp_name_of_filetype = {
 	asm = "asm_lsp",
 	s = "asm_lsp",
 	S = "asm_lsp",
+	vhdl = "vhdl_lsp",
 }
+
+local c_lsp_func = function()
+	local clangd = pre_config.clangdNotCCLS
+
+	if clangd then
+		return require("lsp.c")
+	else
+		return require("lsp.ccls")
+	end
+end
 
 -- Lazy mapping: filetype -> function that returns the LSP config
 M.config_of_filetype = {
@@ -97,10 +124,10 @@ M.config_of_filetype = {
 	sh = function() return require("lsps.bash") end,
 	zsh = function() return require("lsps.bash") end,
 	opencl = function() return require("lsps.opencl") end,
-	c = function() return require("lsps.c") end,
-	cpp = function() return require("lsps.c") end,
-	objc = function() return require("lsps.c") end,
-	objcpp = function() return require("lsps.c") end,
+	c = c_lsp_func,
+	cpp = c_lsp_func,
+	objc = c_lsp_func,
+	objcpp = c_lsp_func,
 	rust = function() return require("lsps.rust") end,
 	java = function() return require("lsps.java") end,
 	tex = function() return require("lsps.latex") end,
@@ -109,6 +136,7 @@ M.config_of_filetype = {
 	asm = function() return require("lsps.asm") end,
 	s = function() return require("lsps.asm") end,
 	S = function() return require("lsps.asm") end,
+	vhdl = function() return require("lsps.vhdl") end,
 }
 
 -- Lazy loader: LSP server name -> function returning its config
@@ -122,6 +150,7 @@ M.config_of_lspname = {
 	texlab = function() return require("lsps.latex") end,
 	asm_lsp = function() return require("lsps.asm") end,
 	opencl = function() return require("lsps.opencl") end,
+	vhdl_ls = function() return require("lsps.vhdl") end,
 }
 
 --- @param name string The name of the LSP server (e.g., "pyright", "clangd").
@@ -185,8 +214,17 @@ end
 
 --- Function to check active buffers and attach corresponding LSPs
 M.attach_lsp_to_all_buffers = function()
+	-- AttachAllLSPs function implementation
 	gu().print_custom("Attaching all LSPs")
 	for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+		-- skip invalid / unloaded buffers early
+
+		-- gu().print_custom("The buffer: " .. vim.inspect(bufnr))
+
+		if not vim.api.nvim_buf_is_valid(bufnr) then
+			goto continue
+		end
+
 		local filetype = vim.bo[bufnr].filetype
 
 		-- If the filetype is empty, trigger filetype detection
@@ -204,6 +242,8 @@ M.attach_lsp_to_all_buffers = function()
 			gu().print_custom("The filetype detect worked")
 		end
 
+		gu().print_custom("The filetype is: " .. vim.inspect(filetype))
+
 		-- Check if there's a corresponding LSP for this filetype
 		local lsp_name = M.lsp_name_of_filetype[filetype]
 		if lsp_name then
@@ -214,10 +254,98 @@ M.attach_lsp_to_all_buffers = function()
 				"No LSP for filetype " .. vim.inspect(filetype) .. " at bufnr: " .. vim.inspect(bufnr) .. " with filename: " .. vim.inspect(filename)
 			)
 		end
+
+		::continue::
 	end
 end
 
-M.add_keybinds = function(client, bufnr)
+function lsp_hover()
+	local params = vim.lsp.util.make_position_params()
+	vim.lsp.buf_request(0, "textDocument/hover", params, function(err, result)
+		if err or not result or not result.contents then
+			return
+		end
+
+		-- Get raw content
+		local content = result.contents
+		local lines = {}
+
+		if type(content) == "table" and content.value then
+			lines = vim.split(content.value, "\n")
+		elseif type(content) == "string" then
+			lines = vim.split(content, "\n")
+		else
+			lines = vim.split(vim.inspect(content), "\n")
+		end
+
+		lines = vim.lsp.util.trim_empty_lines(lines)
+		if vim.tbl_isempty(lines) then
+			return
+		end
+
+		-- Detect filetype from current buffer
+		local ft = vim.bo.filetype
+
+		-- Calculate width
+		local width = 0
+		for _, line in ipairs(lines) do
+			width = math.max(width, vim.fn.strdisplaywidth(line))
+		end
+		width = math.min(width + 4, 80)
+		local height = math.min(#lines + 2, 25)
+
+		-- Create buffer
+		local bufnr = vim.api.nvim_create_buf(false, true)
+		vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+
+		-- Set filetype to current buffer's language for syntax highlighting
+		vim.api.nvim_buf_set_option(bufnr, "filetype", ft)
+
+		-- Enable treesitter for this language
+		pcall(vim.treesitter.start, bufnr, ft)
+
+		-- Open window
+		local win = vim.api.nvim_open_win(bufnr, false, {
+			relative = "cursor",
+			width = width,
+			height = height,
+			col = 1,
+			row = 1,
+			style = "minimal",
+			border = "rounded",
+			focusable = true, -- Make it focusable for interactions
+		})
+
+		-- Auto-close on cursor move, but allow interaction
+		local close_timer
+		vim.api.nvim_create_autocmd("CursorMoved", {
+			callback = function()
+				-- Don't close if cursor is in the hover window
+				local current_win = vim.api.nvim_get_current_win()
+				if current_win == win then
+					return
+				end
+				if vim.api.nvim_win_is_valid(win) then
+					vim.api.nvim_win_close(win, true)
+				end
+			end,
+			once = false, -- Keep running
+		})
+
+		-- Close on escape
+		vim.api.nvim_create_autocmd("BufLeave", {
+			buffer = bufnr,
+			callback = function()
+				if vim.api.nvim_win_is_valid(win) then
+					vim.api.nvim_win_close(win, true)
+				end
+			end,
+			once = true,
+		})
+	end)
+end
+
+M.add_keybinds = function()
 	local keymap = vim.keymap
 	local hl = "core.plugins_lazy.helper.lsp_keybind"
 	local tb = "telescope.builtin"
@@ -225,7 +353,9 @@ M.add_keybinds = function(client, bufnr)
 	local keybind_helper = require(hl)
 
 	-- LSP Information
-	keymap.set("n", "<leader>Lg", keybind_helper.safe_lsp_call("hover"), opts("Show LSP hover info"))
+	keymap.set("n", "$", keybind_helper.safe_lsp_call("hover"), opts("Show LSP hover info"))
+	-- keymap.set("n", "$", function() vim.lsp.buf.hover({ border = "rounded", max_height = 25, max_width = 120 }) end, opts("Hover documentation"))
+
 	keymap.set("n", "<leader>Ls", keybind_helper.safe_lsp_call("signature_help"), opts("Show function signature help"))
 
 	-- Workspace Folder Management
@@ -239,10 +369,22 @@ M.add_keybinds = function(client, bufnr)
 		end
 	end, opts("List workspace folders"))
 
-	keymap.set("n", "<leader>de", function() require(tb).diagnostics({ default_text = ":E:" }) end, opts("Show Errors and diagnostics (Telescope UI)"))
+	keymap.set(
+		"n",
+		"<leader>de",
+		function() require(tb).diagnostics({ default_text = ":E:", bufnr = 0 }) end,
+		opts("Show Errors and diagnostics (Telescope UI)")
+	)
+	keymap.set("n", "<leader>dE", function() require(tb).diagnostics({ default_text = ":E:" }) end, opts("Show Errors and diagnostics (Telescope UI)"))
 	keymap.set(
 		"n",
 		"<leader>dw",
+		function() require(tb).diagnostics({ default_text = ":W:", bufnr = 0 }) end,
+		opts("Show Warning and diagnostics (Telescope UI)")
+	)
+	keymap.set(
+		"n",
+		"<leader>dW",
 		function() require(tb).diagnostics({ default_text = ":W:" }) end,
 		opts("Show Warning and diagnostics (Telescope UI)")
 	)

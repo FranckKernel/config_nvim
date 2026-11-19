@@ -78,10 +78,12 @@ function M.config()
 	local nvim_possession = require("nvim-possession") -- require inside config
 	local lsp_helper = require("lsps.helper.lsp_config_helper")
 
+	local session_variable = "current_session"
+
 	nvim_possession.setup({
 		sessions = {
 			sessions_path = set_session_dir_flattened(),
-			sessions_variable = "current_session",
+			sessions_variable = session_variable,
 			sessions_icon = "󰀚 ",
 			sessions_prompt = "📌 Select Session >",
 		},
@@ -92,32 +94,51 @@ function M.config()
 			exclude_ft = { "NvimTree", "neo-tree", "TelescopePrompt" },
 		},
 		post_hook = function()
+			-- Runs when you open neovim
 			-- $HOME/.config/nvim/scripts/pythonScripts/open_remote_nvim.py
 			-- $HOME/.config/nvim/nvim-possession/lua/nvim-possession/regular_init.lua
 			-- $HOME/.config/nvim/lua/core/plugins_lazy/possessions.lua
 
+			local current_session_name = vim.g[session_variable]
+			local current_session_dir = session_dir
+			local buffer_json_path = current_session_dir .. current_session_name .. "_barbar_buffer_orders.json"
+			ggu().print_custom("The current session name is ", current_session_name)
+			ggu().print_custom("The current session dir is ", current_session_dir)
+			ggu().print_custom("Buffer json path:", buffer_json_path)
+			local barbar_helper = require("core.plugins_lazy.helper.barbar")
+
+			barbar_helper.reorder_buffer_to_json(buffer_json_path)
+
 			vim.cmd([[ScopeLoadState]])
 			load_tab_names()
-			vim.cmd([[AttachAllLSPs]])
+			lsp_helper = require("lsps.helper.lsp_config_helper")
+			lsp_helper.attach_lsp_to_all_buffers()
 			-- The attach all lsp call is needed for the one buffer i was active on
 
-			print("python lsp attached")
 			lsp_helper.add_keybinds()
+			ggu().print_custom("Attached\n")
 
 			vim.cmd("doautocmd User PossessionSessionLoaded")
 		end,
 		save_hook = function()
 			vim.cmd([[ScopeSaveState]])
 			save_tab_names()
+
+			local current_session_name = vim.g[session_variable]
+			local current_session_dir = session_dir
+			local buffer_json_path = current_session_dir .. current_session_name .. "_barbar_buffer_orders.json"
+			ggu().print_custom("The current session name is ", current_session_name)
+			ggu().print_custom("The current session dir is ", current_session_dir)
+			ggu().print_custom("Buffer json path:", buffer_json_path)
+			local barbar_helper = require("core.plugins_lazy.helper.barbar")
+			barbar_helper.save_buff_order(buffer_json_path)
 		end,
 		sort = require("nvim-possession.sorting").time_sort,
 	})
 
 	local session_file = session_dir .. session_name .. ".vim"
 	ggu().print_custom("user_config: session file is " .. vim.inspect(session_file))
-	if vim.fn.filereadable(session_file) == 0 then
-		nvim_possession.create(session_name)
-	end
+	-- don't need auto session file creation
 
 	-- Keymaps
 	local keymap = vim.keymap
@@ -133,10 +154,11 @@ end
 -- --------------------------
 
 return {
-	"PoutineSyropErable/nvim-possession", --- TODO, make my own
+	-- "PoutineSyropErable/nvim-possession", --- TODO, make my own
+	dir = "~/.config/nvim/nvim-possession",
 	branch = "main",
 	dependencies = {
-		"ibhagwan/fzf-lua",
+		"nvim-telescope/telescope.nvim",
 		{
 			"tiagovla/scope.nvim",
 			lazy = false,

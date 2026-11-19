@@ -5,6 +5,7 @@ local keymap = vim.keymap
 local function opts(desc) return { noremap = true, silent = true, desc = desc } end
 
 local gu = require("_before.general_utils")
+local pre_config = require("_before.pre_config")
 local notify_debug = gu.send_notification
 local print_custom = gu.print_custom
 
@@ -98,12 +99,15 @@ keymap.set("n", "«", "@", { noremap = true, silent = true })
 ---------------------------WORD NAVIGATION:
 ------------------------------------------- REMAP of  e,q for end of word.
 ------------------------------------------- REMAP of w,s for start of word
--- Map `w` to move to the start of the next word
-keymap.set("n", "w", "w", { noremap = true, silent = true })
-keymap.set("n", "W", "W", { noremap = true, silent = true })
--- Map `s` to move to the end of the previous word
-keymap.set("n", "s", "ge", { noremap = true, silent = true })
-keymap.set("n", "S", "gE", { noremap = true, silent = true })
+
+if pre_config.word_ws then
+	-- Map `w` to move to the start of the next word
+	keymap.set("n", "w", "w", { noremap = true, silent = true })
+	keymap.set("n", "W", "W", { noremap = true, silent = true })
+	-- Map `s` to move to the end of the previous word
+	keymap.set("n", "s", "ge", { noremap = true, silent = true })
+	keymap.set("n", "S", "gE", { noremap = true, silent = true })
+end
 
 -- Map `e` to move to the end of the next word
 keymap.set("n", "e", "e", { noremap = true, silent = true })
@@ -138,8 +142,8 @@ keymap.set("v", "o", "o", opts("Change cursor selection in visual mode. Top/Bott
 -- keymap.set("n", "<leader>yy", '"+yy', { noremap = true, silent = true })
 keymap.set("n", "<leader>C", '"+yy', { noremap = true, silent = true })
 keymap.set("v", "<leader>C", '"+yy', { noremap = true, silent = true })
-keymap.set("n", "<leader>P", '"+p', { noremap = true, silent = true })
-keymap.set("v", "<leader>P", '"+p', { noremap = true, silent = true })
+keymap.set("n", "<leader>v", '"+p', { noremap = true, silent = true })
+keymap.set("v", "<leader>V", '"+p', { noremap = true, silent = true })
 
 keymap.set("n", "<C-c>", '"+y', { noremap = true, silent = true })
 keymap.set("n", "<C-x>", '"+d', { noremap = true, silent = true })
@@ -161,19 +165,20 @@ keymap.set("v", "<BS>", '"_d', { noremap = true, silent = true })
 
 ---------------------- Fixes
 -- To have access to a way to increase an number
-keymap.set("n", "<leader>y", "<C-a>", { noremap = true, silent = true })
+keymap.set("n", "<leader>y", "<C-a>", opts("increase number, w also work to decrease"))
+keymap.set("n", "<leader>Y", "<C-a>", opts("increase number, w also work to decrease"))
 keymap.set("n", "<leader>w", "<C-x>", { noremap = true, silent = true })
 keymap.set("v", "<leader>y", "<C-a>", { noremap = true, silent = true })
 -- Remap Ctrl+v to Ctrl+q in all modes so block visual mode works
 keymap.set({ "" }, "<C-v>", "<C-q>", { noremap = true, silent = true })
 
+-------------------- SMALL QOL -------------------
+
+keymap.set("n", "x", '"_x', { noremap = true, silent = true })
+keymap.set("v", "x", '"_x', { noremap = true, silent = true })
+
 ----------------------Others ----------------------------
 -- Function to get the current file path and copy to clipboard
-local function copy_current_file_path()
-	local file_path = vim.fn.expand("%:p") -- Get the absolute path of the current file
-	vim.fn.setreg("+", file_path) -- Copy to system clipboard (+ register)
-	vim.api.nvim_echo({ { "File path copied: " .. file_path, "Normal" } }, false, {})
-end
 
 local function execute_current_file()
 	local file_path = vim.api.nvim_buf_get_name(0) -- Get the full file path
@@ -184,28 +189,112 @@ function RunCurrentFile()
 	local filepath = vim.api.nvim_buf_get_name(0) -- Get the full file path
 	local file_ext = vim.fn.fnamemodify(filepath, ":e") -- Get the file extension
 
-	if file_ext == "sh" then
-		-- Run Bash script
-		vim.cmd("!bash " .. vim.fn.shellescape(filepath))
-	elseif file_ext == "c" then
-		-- Compile and run C file
-		local executable = vim.fn.shellescape(filepath:gsub("%.c$", ""))
-		vim.cmd("!gcc " .. vim.fn.shellescape(filepath) .. " -o " .. executable .. " && " .. executable)
-	elseif file_ext == "cpp" then
-		-- Compile and run C file
-		local executable = vim.fn.shellescape(filepath:gsub("%.cpp$", ""))
-		vim.cmd("!g++ " .. vim.fn.shellescape(filepath) .. " -o " .. executable .. " && " .. executable)
-	elseif file_ext == "py" then
-		-- Run Python script
-		vim.cmd("!python3 " .. vim.fn.shellescape(filepath))
-	elseif file_ext == "java" then
-		local home = vim.fn.expand("$HOME")
-		local AutoMakeJava_location = "/Documents/University (Real)/Semester 10/Comp 303/AutomakeJava"
-		local autoMakeScript = home .. AutoMakeJava_location .. "/src/automake.py"
-		vim.cmd("!python3 " .. vim.fn.shellescape(autoMakeScript) .. " " .. vim.fn.shellescape(filepath))
-	else
-		print_custom("File type not supported for running with F4")
+	if filepath == "" then
+		print("No file to run")
+		return
 	end
+
+	-- Get the current directory for the terminal
+	local current_dir = vim.fn.getcwd()
+	local basename = vim.fn.fnamemodify(filepath, ":t:r") -- Get filename without extension
+
+	-- Dictionary of extension -> build/run function
+	local runners = {
+		sh = function() return "bash " .. vim.fn.shellescape(filepath) end,
+		c = function() return string.format("gcc %s -o %s.out && ./%s.out", vim.fn.shellescape(filepath), basename, basename) end,
+		cpp = function() return string.format("g++ %s -o %s.out && ./%s.out", vim.fn.shellescape(filepath), basename, basename) end,
+		py = function() return "python3 " .. vim.fn.shellescape(filepath) end,
+		java = function()
+			local home = vim.fn.expand("$HOME")
+			local AutoMakeJava_location = "/Documents/University (Real)/Semester 10/Comp 303/AutomakeJava"
+			local autoMakeScript = home .. AutoMakeJava_location .. "/src/automake.py"
+			return "python3 " .. vim.fn.shellescape(autoMakeScript) .. " " .. vim.fn.shellescape(filepath)
+		end,
+		zig = function()
+			local executable = basename
+			local build_cmd = "zig build-exe " .. vim.fn.shellescape(filepath) .. " -femit-bin=" .. vim.fn.shellescape(executable)
+			local execute_command = current_dir .. "/" .. executable
+			return build_cmd .. " && " .. execute_command
+		end,
+		ino = function()
+			-- calls espflash "cureent file"
+			return "zsh -ic " .. vim.fn.shellescape("espflash " .. filepath)
+		end,
+		lua = function()
+			--
+			return "lua " .. vim.fn.shellescape(filepath)
+		end,
+		asm = function()
+			local obj = basename .. ".o"
+			local cmds = {
+				string.format("nasm -f elf64 -g -F dwarf %s -o %s", vim.fn.shellescape(filepath), vim.fn.shellescape(obj)),
+				string.format("ld %s -o %s", vim.fn.shellescape(obj), vim.fn.shellescape(basename)),
+				vim.fn.shellescape("./" .. basename),
+			}
+			return table.concat(cmds, " && ")
+		end,
+	}
+
+	-- Early exit if extension not supported
+	local runner = runners[file_ext]
+	if not runner then
+		print("File type ." .. file_ext .. " not supported for running with F4")
+		return
+	end
+
+	-- Floating terminal window setup
+	local buf = vim.api.nvim_create_buf(false, true) -- create scratch buffer, no file, hidden on close
+
+	local width_ratio = 0.8 -- Could be a config variable
+	local height_ratio = 0.8 -- Could be a config variable
+	local width = math.floor(vim.o.columns * width_ratio)
+	local height = math.floor(vim.o.lines * height_ratio)
+
+	local row = math.floor((vim.o.lines - height) / 2)
+	local col = math.floor((vim.o.columns - width) / 2)
+
+	local options = {
+		relative = "editor",
+		width = width,
+		height = height,
+		row = row,
+		col = col,
+		style = "minimal",
+		border = "rounded",
+	}
+
+	local win = vim.api.nvim_open_win(buf, true, options)
+
+	-- Get the command from the runner function
+	local command = runner()
+
+	-- Run the command in the terminal
+	vim.fn.termopen(command, {
+		on_exit = function()
+			-- Switch to normal mode when command finishes
+			vim.schedule(function() vim.cmd("stopinsert") end)
+		end,
+	})
+
+	local keybind_opts = function(desc)
+		--
+		return { buffer = buf, noremap = true, silent = true, desc = desc }
+	end
+	local exit_term = function()
+		if vim.api.nvim_win_is_valid(win) then
+			vim.api.nvim_win_close(win, true)
+		end
+	end
+
+	-- Setup close on Enter
+	vim.keymap.set("n", "<CR>", exit_term, keybind_opts("Exit on Enter"))
+	vim.keymap.set("n", "<Esc>", exit_term, keybind_opts("Exit on Escape"))
+	vim.keymap.set("n", "jk", exit_term, keybind_opts("Exit on jk"))
+	vim.keymap.set("n", "q", exit_term, keybind_opts("Exit on q"))
+
+	-- Start in insert mode and hide buffer from list
+	vim.cmd("startinsert")
+	vim.api.nvim_buf_set_option(buf, "buflisted", false)
 end
 
 -- Function to run the build script with the current file
@@ -237,23 +326,16 @@ local function run_do_all()
 	vim.notify("Output:\n" .. output, vim.log.levels.INFO)
 end
 
-keymap.set("n", "<F1>", copy_current_file_path, opts("Copy current file path"))
-keymap.set("n", "<F2>", execute_current_file, opts("Stupidly execute current file"))
 -- keymap.set("n", "<F3>", run_do_all, opts("Run do all script (build, run, and more) {./aaa_doall.sh}"))
 keymap.set("n", "<F4>", RunCurrentFile, opts("Run current file"))
 keymap.set("n", "<F5>", run_build_script, opts("Run build script (No argument) - (build.sh)"))
 keymap.set("n", "<F6>", run_build_script_with_file, opts("Run build script (with this file as argument) - (build.sh $thisFile)"))
 keymap.set("n", "<F7>", run_build_test_script, opts("Run test script (with this file as argument) - (build_test.sh $thisFile)"))
-keymap.set("n", "<F8>", run_do_all, opts("Run do all script (build, run, and more) {./aaa_doall.sh}"))
-
-local oil_open = function() require("oil").open() end
+-- keymap.set("n", "<F8>", run_do_all, opts("Run do all script (build, run, and more) {./aaa_doall.sh}"))
 
 --
 -- Key mapping to source the current file (Only works for reloading nvim configuration)
 keymap.set("n", "<leader>sr", ":source %<CR>", { noremap = true, silent = true })
-keymap.set("n", "<leader>tt", ":NvimTreeToggle<CR>", { noremap = true, silent = true })
-keymap.set("n", "-", oil_open, { desc = "Open parent directory" })
-keymap.set("n", "+", ":Oil<CR>", { noremap = true, silent = true })
 
 --- Weird stuff
 
@@ -349,11 +431,12 @@ keymap.set("n", "<C-w>=", "<C-w>=") -- make split windows equal width
 keymap.set("n", "<C-w>h", ":vsplit<CR>", opts("Vertical split"))
 keymap.set("n", "<C-w>v", ":split<CR>", opts("Horizontal split"))
 keymap.set("n", "<C-w>f", ":MaximizerToggle<CR>", { noremap = true, silent = true })
+keymap.set("n", "<F8>", ":MaximizerToggle<CR>", { noremap = true, silent = true })
 
 keymap.set("n", "<C-w>c", "<Cmd>tabnew<CR>", opts("New tab"))
 keymap.set("n", "<C-w>x", "<Cmd>tabclose<CR>", opts("Close tab"))
-keymap.set("n", "<C-w>b", "<Cmd>tabprevious<CR>", opts("Previous buffer"))
-keymap.set("n", "<C-w>n", "<Cmd>tabnext<CR>", opts("Next buffer"))
+keymap.set("n", "<C-w>b", "<Cmd>tabprevious<CR>", opts("Previous tab"))
+keymap.set("n", "<C-w>n", "<Cmd>tabnext<CR>", opts("Next tab"))
 
 keymap.set("n", "<C-Up>", ":resize +5<CR>", { noremap = true, silent = true })
 keymap.set("n", "<C-Down>", ":resize -5<CR>", { noremap = true, silent = true })

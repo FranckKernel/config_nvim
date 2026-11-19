@@ -12,10 +12,12 @@ end
 return {
 	"akinsho/git-conflict.nvim",
 	event = { "BufReadPost" },
+	keys = {},
 	config = function()
 		require("git-conflict").setup({
 			default_mappings = false, -- Enable default keymaps
-			disable_diagnostics = true, -- Disable LSP diagnostics during conflicts
+			disable_diagnostics = false, -- Disable LSP diagnostics during conflicts
+			-- disabling it fucks with vim 0.12 API, so this skips the code path
 			highlights = {
 				incoming = "DiffAdd",
 				current = "DiffText",

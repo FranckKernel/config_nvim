@@ -16,6 +16,11 @@ vim.opt.shiftround = true
 vim.opt.expandtab = false
 vim.o.autoindent = true -- Maintain indentation from the previous line
 vim.o.smartindent = true -- More intelligent auto-indentation
+vim.opt.modeline = false
+
+if vim.fn.exists("+winborder") == 1 then
+	vim.o.winborder = "rounded" -- whatever value you use
+end
 
 vim.opt.mousemoveevent = true -- activate mouse
 vim.opt.mouse = "nvc" -- Enable mouse in Normal, Visual, and Command mode
@@ -93,8 +98,11 @@ vim.opt.sessionoptions = { -- required
 }
 -- let g:gitgutter_enabled = 0
 
-vim.cmd("set verbosefile=$HOME/.config/nvim_logs/nvim_log.lua")
-vim.cmd("set verbose=12") -- maximum verbosity
+local preconfig = require("_before.pre_config")
+if preconfig.verbose_log then
+	vim.cmd("set verbosefile=$HOME/.config/nvim_logs/nvim_log.lua")
+	vim.cmd("set verbose=12") -- maximum verbosity
+end
 
 vim.opt.undofile = true -- Enable persistent undo
 vim.opt.undodir = vim.fn.stdpath("data") .. "/undo" -- Set undo directory
@@ -106,6 +114,16 @@ vim.g.csv_highlight_row = "y" -- Enable row highlighting
 vim.filetype.add({
 	extension = {
 		cl = "opencl", -- Force .cl files to use opencl filetype
+		xdc = "tcl",
+
+		ixx = "cpp", -- Simpler way to map .ixx to cpp
+	},
+	filename = {
+		["config"] = function(path)
+			if path:match("/%.config/polybar/config$") then
+				return "ini"
+			end
+		end,
 	},
 })
 

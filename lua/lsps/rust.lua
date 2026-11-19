@@ -1,4 +1,4 @@
--- lua/core/lsps/rust.lua
+-- lua/lsps/rust.lua
 M = {}
 
 M.config = {

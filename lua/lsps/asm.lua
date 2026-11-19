@@ -4,10 +4,17 @@ M.config = {
 	cmd = { "asm-lsp" },
 	filetypes = { "asm", "s", "S", "inc" },
 	root_dir = require("lspconfig.util").root_pattern(".git", ".asm-lsp.toml"),
-	on_attach = function(client, bufnr)
+
+	on_init = function(client, bufnr)
+		print("Lsp asm-lsp initiated")
+
 		local lsp_helper = require("lsps.helper.lsp_config_helper")
-		print("c lsp attached")
 		lsp_helper.add_keybinds()
+	end,
+	on_attach = function(client, bufnr)
+		--
+		-- client.server_capabilities.completionProvider = nil
+		print("ASM lsp attached")
 	end,
 }
 

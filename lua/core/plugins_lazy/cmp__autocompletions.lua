@@ -18,24 +18,6 @@ return {
 		local luasnip = require("luasnip")
 		require("luasnip.loaders.from_vscode").lazy_load()
 
-		-- Custom bash completion source
-		cmp.register_source("bash", {
-			complete = function(_, _, callback)
-				local handle = io.popen('bash -c "compgen -c"')
-				if handle then
-					local result = handle:read("*a")
-					handle:close()
-					local items = {}
-					for cmd in string.gmatch(result, "[^\n]+") do
-						table.insert(items, { label = cmd })
-					end
-					callback({ items = items, isIncomplete = false })
-				else
-					callback({ items = {}, isIncomplete = true })
-				end
-			end,
-		})
-
 		cmp.setup({
 			snippet = {
 				expand = function(args) luasnip.lsp_expand(args.body) end,
@@ -58,13 +40,22 @@ return {
 			}),
 			formatting = {
 				format = function(entry, vim_item)
-					if entry.source.name == "nvim_lsp" then
-						local documentation = entry.completion_item.documentation
-						if documentation then
-							vim_item.documentation = documentation
-						end
-						vim_item.kind = string.format("%s %s", vim_item.kind, entry.completion_item.label)
+					local ci = entry.completion_item
+
+					-- 1. LSP function signature (THIS is what you were missing)
+					if ci.labelDetails and ci.labelDetails.detail then
+						vim_item.abbr = ci.label .. ci.labelDetails.detail
 					end
+
+					-- 2. keep documentation (your existing logic, fixed safely)
+					if ci.documentation then
+						vim_item.documentation = ci.documentation
+					end
+
+					-- 3. preserve kind (DON'T append label here)
+					vim_item.kind = vim_item.kind
+
+					-- 4. menu labels (unchanged)
 					vim_item.menu = ({
 						nvim_lsp = "[LSP]",
 						luasnip = "[Snip]",
@@ -72,6 +63,7 @@ return {
 						path = "[Path]",
 						bash = "[Bash]",
 					})[entry.source.name]
+
 					return vim_item
 				end,
 			},
@@ -97,6 +89,16 @@ return {
 				end,
 			})
 		end
+
+		local bash_completion = require("core.plugins_lazy.helper.autocompletion_bash")
+
+		-- Register Bash completion source.
+		cmp.register_source("bash", bash_completion.source)
+
+		-- Refresh Bash completion cache.
+		vim.keymap.set("n", "<leader>cb", bash_completion.refresh, {
+			desc = "Refresh Bash command completion cache",
+		})
 
 		setup_cmdline("/", { { name = "buffer" } })
 		cmp.setup.cmdline(":", {

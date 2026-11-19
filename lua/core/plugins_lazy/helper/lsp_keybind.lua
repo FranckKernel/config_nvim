@@ -3,10 +3,11 @@ M = {}
 local gu = require("_before.general_utils")
 local keymap = vim.keymap
 
-function M.safe_lsp_call(fn)
+function M.safe_lsp_call(fn, ...)
+	local args = { ... }
 	return function()
 		if vim.lsp.buf[fn] then
-			vim.lsp.buf[fn]()
+			vim.lsp.buf[fn](unpack(args))
 		else
 			gu.print_custom("LSP function '" .. fn .. "' not available")
 		end

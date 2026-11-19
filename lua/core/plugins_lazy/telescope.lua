@@ -11,11 +11,26 @@ return {
 				function() require(hp).find_files() end,
 				desc = "Find Files",
 			},
-
 			{
 				"<leader>fF",
 				function() require(hp).find_files_in_project() end,
 				desc = "Find Files in Project",
+			},
+
+			{
+				"<leader>f1",
+				function() require(hp).find_files_back(1) end,
+				desc = "Find Files",
+			},
+			{
+				"<leader>f2",
+				function() require(hp).find_files_back(2) end,
+				desc = "Find Files",
+			},
+			{
+				"<leader>f3",
+				function() require(hp).find_files_back(3) end,
+				desc = "Find Files",
 			},
 
 			{
@@ -27,6 +42,21 @@ return {
 				"<leader>fG",
 				function() require(hp).live_grep_in_project() end,
 				desc = "Live grep in Project",
+			},
+			{
+				"<leader>g1",
+				function() require(hp).live_grep_back(1) end,
+				desc = "Live grep",
+			},
+			{
+				"<leader>g2",
+				function() require(hp).live_grep_back(2) end,
+				desc = "Live grep",
+			},
+			{
+				"<leader>g3",
+				function() require(hp).live_grep_back(3) end,
+				desc = "Live grep",
 			},
 
 			{
@@ -55,7 +85,7 @@ return {
 				desc = "Live grep current big word (Till spaces)",
 			},
 			{
-				"ga",
+				"gA",
 				function() require(hp).grep_current_big_word_in_project() end,
 				desc = "Live grep current big word in project (Till spaces)",
 			},
@@ -92,7 +122,7 @@ return {
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			"nvim-tree/nvim-web-devicons",
-			"nvim-telescope/telescope-fzf-native.nvim", -- fzf extension
+			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" }, -- fzf extension
 			"nvim-telescope/telescope-ui-select.nvim",
 			"nvim-telescope/telescope-file-browser.nvim",
 			"AckslD/nvim-neoclip.lua",
@@ -143,7 +173,23 @@ return {
 							preview_height = 0.5,
 						},
 					},
-					file_ignore_patterns = { "node_modules/.*", "%.git/.*", "%.nvim%-session/.*", "%.o$", "%.bin$" },
+					file_ignore_patterns = {
+						"node_modules/.*",
+						"%.git/.*",
+						"%.nvim%-session/.*",
+						"%.o$",
+						"%.a$",
+						"lazy%-lock.json*",
+						"%.bin$",
+						"%.pcm$",
+						"%build/.*",
+						"%.vim/.*",
+						"%old_vim/.*",
+						"%nvim_config/.*",
+						"%vim_config/.*",
+						"%.ccls%-cache/.*",
+						"%.cache/.*",
+					},
 				},
 				pickers = {
 					find_files = {
@@ -187,12 +233,24 @@ return {
 						override_file_sorter = true,
 						case_mode = "smart_case",
 					},
+					live_grep = {
+						additional_args = function(_)
+							return {
+								"--glob",
+								"!*.dump",
+							}
+						end,
+					},
 				},
 			})
+
+			-- local telescope_fzf_native = require("telescope-fzf-native")
 
 			-- Load extensions
 			telescope.load_extension("neoclip")
 			telescope.load_extension("fzf")
+			-- cd $HOME/.local/share/nvim/lazy/telescope-fzf-native.nvim
+			-- make
 			telescope.load_extension("ui-select")
 			telescope.load_extension("file_browser")
 			telescope.load_extension("scope")

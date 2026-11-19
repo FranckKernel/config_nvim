@@ -127,13 +127,20 @@ return {
 		keymap("n", "<leader>B", "<Cmd>BufferMovePrevious<CR>", opts("Move buffer left (Barbar)"))
 		keymap("n", "<leader>N", "<Cmd>BufferMoveNext<CR>", opts("Move buffer right (Barbar)"))
 
-		local bh = require(hb)
+		local barbar_helper = require(hb)
 
 		for i = 1, 9 do
-			keymap("n", "<leader>" .. i, function() bh.goto_buffer(i) end, opts("Go to buffer " .. i))
+			keymap("n", "<leader>" .. i, function() barbar_helper.goto_buffer(i) end, opts("Go to buffer " .. i))
 		end
 
-		keymap("n", "<leader>0", function() bh.goto_buffer(10) end, opts("Go to buffer 10"))
+		keymap("n", "<leader>0", function() barbar_helper.goto_buffer(10) end, opts("Go to buffer 10"))
+
+		local ggu = function() return require("_before.general_utils") end
+
+		keymap("n", "<leader>.b", function() barbar_helper.save_buff_order("buffers.json") end, opts("Print barbar buffer order"))
+		keymap("n", "<leader>.p", function() barbar_helper.load_and_print_buff_order("buffers.json") end, opts("Print barbar buffer order"))
+		keymap("n", "<leader>.r", function() barbar_helper.reorder_buffer_to_json("buffers.json") end, opts("Print barbar buffer order"))
+		keymap("n", "<leader>.P", function() barbar_helper.print_current_internal_state("buffers.json") end, opts("Print barbar buffer order"))
 
 		-- keys, keybinds, keymaps, keyboard shortcut --
 	end,
