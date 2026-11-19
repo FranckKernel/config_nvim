@@ -29,6 +29,10 @@ return {
 			inc_rename = false,
 			lsp_doc_border = true,
 		},
+
+		-- cmdline = {
+		-- 	enabled = false,
+		-- },
 	},
 	config = function(_, opts)
 		require("noice").setup(opts)
