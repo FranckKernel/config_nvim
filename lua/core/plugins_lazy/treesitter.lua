@@ -61,7 +61,12 @@ return {
 						if not vim.api.nvim_buf_is_loaded(args.buf) then
 							return
 						end
-						vim.treesitter.start(args.buf, lang)
+
+						local ok, err = pcall(vim.treesitter.start, args.buf, lang)
+
+						if not ok then
+							vim.notify("Failed to start Tree-sitter for " .. lang .. ":\n" .. tostring(err), vim.log.levels.ERROR)
+						end
 					end)
 
 					-- pcall(vim.treesitter.start, args.buf, lang)
